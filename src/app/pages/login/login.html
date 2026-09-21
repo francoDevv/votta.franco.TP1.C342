@@ -1,0 +1,17 @@
+<h1>Ingresar</h1>
+
+@if (auth.cargando()) {
+    <p>Cargando…</p>
+    } @else if (auth.logueado()) {
+    <p>Sesión iniciada como {{ auth.usuario()?.email }} · rol: <strong>{{ auth.rol() }}</strong></p>
+    <button (click)="salir()">Cerrar sesión</button>
+    } @else {
+    <form [formGroup]="form" (ngSubmit)="entrar()">
+        <input type="email" formControlName="email" placeholder="Mail" />
+        <input type="password" formControlName="password" placeholder="Contraseña" />
+        @if (error()) {
+        <small>{{ error() }}</small>
+        }
+        <button [disabled]="form.invalid || enviando()">Entrar</button>
+    </form>
+    }
