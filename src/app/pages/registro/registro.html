@@ -1,0 +1,33 @@
+<h1>Crear cuenta</h1>
+
+<form [formGroup]="form" (ngSubmit)="registrar()">
+  <input type="email" formControlName="email" placeholder="Mail" />
+  <input type="password" formControlName="password" placeholder="Contraseña (mín. 6 caracteres)" />
+  <input formControlName="nombre" placeholder="Nombre" />
+  <input formControlName="apellido" placeholder="Apellido" />
+
+  <label>
+    Fecha de nacimiento
+    <input type="date" formControlName="fechaNacimiento" />
+  </label>
+
+  <select formControlName="tipoSangre">
+    <option value="" disabled selected>Tipo de sangre</option>
+    @for (t of tiposSangre; track t) {
+      <option [value]="t">{{ t }}</option>
+    }
+  </select>
+
+  <input formControlName="colorOjos" placeholder="Color de ojos" />
+
+  <label>
+    Días de vacaciones por año
+    <input type="number" formControlName="diasVacaciones" />
+  </label>
+
+  @if (error()) {
+    <p>{{ error() }}</p>
+  }
+
+  <button [disabled]="form.invalid || enviando()">Crear cuenta</button>
+</form>

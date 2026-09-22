@@ -5,5 +5,9 @@ export const routes: Routes = [
     path: 'login',
     loadComponent: () => import('./pages/login/login').then(m => m.Login),
   },
+  {
+    path: 'registro',
+    loadComponent: () => import('./pages/registro/registro').then(m => m.Registro),
+  },
   { path: '', redirectTo: 'login', pathMatch: 'full' },
 ];
