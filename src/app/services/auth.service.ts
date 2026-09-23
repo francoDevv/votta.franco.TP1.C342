@@ -31,13 +31,10 @@ export class AuthService {
 
   constructor() {
     this.supabase.auth.onAuthStateChange((_evento, sesion) => {
-        // Si entró un usuario distinto, hay que esperar a conocer su rol
         const cambioUsuario = sesion?.user.id !== this.sesion()?.user.id;
         this.sesion.set(sesion);
         if (sesion && cambioUsuario) this.cargando.set(true);
 
-        // Sin await ni consultas directas dentro del callback: se posterga
-        // para evitar bloqueos en supabase-js.
         setTimeout(() => this.cargarRol(sesion), 0);
         });
     }
