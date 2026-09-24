@@ -1,0 +1,36 @@
+<h1>Cartelera</h1>
+
+<input
+  type="text"
+  placeholder="Buscar película..."
+  [value]="busqueda()"
+  (input)="busqueda.set($any($event.target).value)"
+/>
+
+<select (change)="generoSeleccionado.set($any($event.target).value ? +$any($event.target).value : null)">
+  <option value="">Todos los géneros</option>
+  @for (g of generos(); track g.id) {
+    <option [value]="g.id">{{ g.nombre }}</option>
+  }
+</select>
+
+@if (cargando()) {
+  <p>Cargando cartelera…</p>
+} @else if (peliculasFiltradas().length === 0) {
+  <p>No se encontraron películas.</p>
+} @else {
+  @for (p of peliculasFiltradas(); track p.id) {
+    <article>
+      @if (urlImagen(p.imagen_url); as url) {
+        <img [src]="url" [alt]="p.nombre" />
+      }
+      <h3>{{ p.nombre }}</h3>
+      <p>{{ p.sinopsis }}</p>
+      <p>{{ p.duracion_minutos }} min</p>
+      @if (p.restriccion_edad > 0) {
+        <p>+{{ p.restriccion_edad }}</p>
+      }
+      <p>{{ p.generos.map(g => g.nombre).join(', ') }}</p>
+    </article>
+  }
+}

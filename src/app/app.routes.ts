@@ -16,6 +16,10 @@ export const routes: Routes = [
     canMatch: [authGuard],
     loadComponent: () => import('./pages/perfil/perfil').then(m => m.Perfil),
   },
+  {
+    path: 'cartelera',
+    loadComponent: () => import('./pages/cartelera/cartelera').then(m => m.Cartelera),
+  },
 //   {
 //     path: 'gestor',
 //     canMatch: [rolGuard(['gestor', 'admin'])],
@@ -27,5 +31,5 @@ export const routes: Routes = [
 //     loadChildren: () => import('./admin/admin.routes').then(m => m.ADMIN_ROUTES),
 //   },
 
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '', redirectTo: 'cartelera', pathMatch: 'full' },
 ];
