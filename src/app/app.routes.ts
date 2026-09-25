@@ -25,5 +25,9 @@ export const routes: Routes = [
     canMatch: [rolGuard(['gestor', 'admin'])],
     loadChildren: () => import('./gestor/gestor.routes').then(m => m.GESTOR_ROUTES),
   },
+  {
+    path: 'peliculas/:id',
+    loadComponent: () => import('./pages/pelicula-detalle/pelicula-detalle').then(m => m.PeliculaDetalle),
+  },
   { path: '', redirectTo: 'cartelera', pathMatch: 'full' },
 ];

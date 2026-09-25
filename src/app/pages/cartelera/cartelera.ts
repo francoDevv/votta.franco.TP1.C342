@@ -1,9 +1,11 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { PeliculasService, Pelicula, Genero } from '../../services/peliculas.service';
+import { RouterLink } from '@angular/router';
+
 
 @Component({
   selector: 'app-cartelera',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './cartelera.html',
   styleUrl: './cartelera.css',
 })

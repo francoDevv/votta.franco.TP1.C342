@@ -1,0 +1,56 @@
+@if (cargando()) {
+  <p>Cargando…</p>
+} @else if (pelicula(); as p) {
+  @if (urlImagen(p.imagen_url); as url) {
+    <img [src]="url" [alt]="p.nombre" />
+  }
+  <h1>{{ p.nombre }}</h1>
+  <p>{{ p.sinopsis }}</p>
+  <p>{{ p.duracion_minutos }} min</p>
+  @if (p.restriccion_edad > 0) {
+    <p>+{{ p.restriccion_edad }}</p>
+  }
+  <p>{{ p.generos.map(g => g.nombre).join(', ') }}</p>
+
+  @if (promedio(); as prom) {
+    <p>⭐ {{ prom.promedio }} ({{ prom.cantidad }} reseñas)</p>
+  } @else {
+    <p>Sin reseñas todavía</p>
+  }
+
+  <h2>Reseñas</h2>
+  @for (r of resenas(); track r.id) {
+    <article>
+      <strong>{{ r.clientes.nombre }} {{ r.clientes.apellido }}</strong>
+      <span>{{ '⭐'.repeat(r.estrellas) }}</span>
+      <p>{{ r.comentario }}</p>
+    </article>
+  } @empty {
+    <p>Todavía no hay reseñas para esta película.</p>
+  }
+
+  @if (auth.rol() === 'cliente') {
+    <h3>{{ miResena() ? 'Editar mi reseña' : 'Dejar una reseña' }}</h3>
+    <form (ngSubmit)="guardarResena()">
+      <select [(ngModel)]="estrellasNuevas" name="estrellas">
+        @for (n of [1, 2, 3, 4, 5]; track n) {
+          <option [ngValue]="n">{{ n }} ⭐</option>
+        }
+      </select>
+      <textarea
+        [(ngModel)]="comentarioNuevo"
+        name="comentario"
+        maxlength="300"
+        placeholder="Tu comentario (máx. 300 caracteres)"
+      ></textarea>
+      @if (errorResena()) {
+        <p>{{ errorResena() }}</p>
+      }
+      <button type="submit" [disabled]="guardandoResena() || !comentarioNuevo().trim()">
+        {{ miResena() ? 'Actualizar reseña' : 'Publicar reseña' }}
+      </button>
+    </form>
+  }
+} @else {
+  <p>Película no encontrada.</p>
+}

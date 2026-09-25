@@ -26,6 +26,16 @@ export interface PeliculaDatos {
   imagen_url?: string;
 }
 
+export interface Resena {
+  id: number;
+  pelicula_id: number;
+  cliente_id: string;
+  estrellas: number;
+  comentario: string;
+  creada_en: string;
+  clientes: { nombre: string; apellido: string };
+}
+
 @Injectable({ providedIn: 'root' })
 export class PeliculasService {
   private supabase = inject(SupabaseService).client;
@@ -33,6 +43,8 @@ export class PeliculasService {
   private mapear(p: any): Pelicula {
     return { ...p, generos: p.pelicula_genero.map((pg: any) => pg.generos) };
   }
+
+  // ---------- Cartelera ----------
 
   async listarVisibles(): Promise<Pelicula[]> {
     const { data, error } = await this.supabase
@@ -48,8 +60,23 @@ export class PeliculasService {
     return (data ?? []).map((p) => this.mapear(p));
   }
 
-  // A diferencia de listarVisibles, esta trae TODAS las películas
-  // (incluidas las ocultas), para la pantalla de gestión.
+  async listarGeneros(): Promise<Genero[]> {
+    const { data, error } = await this.supabase
+      .from('generos')
+      .select('id, nombre')
+      .order('nombre');
+    if (error) throw error;
+    return data ?? [];
+  }
+
+  urlImagen(path: string | null): string | null {
+    if (!path) return null;
+    const { data } = this.supabase.storage.from('peliculas').getPublicUrl(path);
+    return data.publicUrl;
+  }
+
+  // ---------- ABM (gestor/admin) ----------
+
   async listarTodas(): Promise<Pelicula[]> {
     const { data, error } = await this.supabase
       .from('peliculas')
@@ -77,21 +104,6 @@ export class PeliculasService {
     return data ? this.mapear(data) : null;
   }
 
-  async listarGeneros(): Promise<Genero[]> {
-    const { data, error } = await this.supabase
-      .from('generos')
-      .select('id, nombre')
-      .order('nombre');
-    if (error) throw error;
-    return data ?? [];
-  }
-
-  urlImagen(path: string | null): string | null {
-    if (!path) return null;
-    const { data } = this.supabase.storage.from('peliculas').getPublicUrl(path);
-    return data.publicUrl;
-  }
-
   async subirImagen(file: File): Promise<string> {
     const extension = file.name.split('.').pop();
     const path = `${crypto.randomUUID()}.${extension}`;
@@ -100,7 +112,6 @@ export class PeliculasService {
     return path;
   }
 
-  // Crea (sin id) o edita (con id) una película, y sincroniza sus géneros.
   async guardar(datos: PeliculaDatos, generoIds: number[], id?: number): Promise<number> {
     let peliculaId = id;
 
@@ -117,8 +128,6 @@ export class PeliculasService {
       peliculaId = data.id;
     }
 
-    // Reescribimos la relación de géneros: se borra todo y se vuelve a
-    // insertar lo que quedó tildado. Más simple que calcular altas y bajas.
     await this.supabase.from('pelicula_genero').delete().eq('pelicula_id', peliculaId);
     if (generoIds.length > 0) {
       const filas = generoIds.map((generoId) => ({ pelicula_id: peliculaId, genero_id: generoId }));
@@ -130,8 +139,55 @@ export class PeliculasService {
   }
 
   async eliminar(id: number): Promise<void> {
-    // pelicula_genero se borra solo, por el "on delete cascade" de la FK.
     const { error } = await this.supabase.from('peliculas').delete().eq('id', id);
+    if (error) throw error;
+  }
+
+  // ---------- Reseñas ----------
+
+  async listarResenas(peliculaId: number): Promise<Resena[]> {
+    const { data, error } = await this.supabase
+      .from('resenas')
+      .select('id, pelicula_id, cliente_id, estrellas, comentario, creada_en, clientes ( nombre, apellido )')
+      .eq('pelicula_id', peliculaId)
+      .order('creada_en', { ascending: false });
+    if (error) throw error;
+    return (data ?? []) as any;
+  }
+
+  async obtenerPromedio(peliculaId: number): Promise<{ promedio: number; cantidad: number } | null> {
+    const { data, error } = await this.supabase
+      .from('promedio_resenas')
+      .select('promedio, cantidad')
+      .eq('pelicula_id', peliculaId)
+      .maybeSingle();
+    if (error) throw error;
+    return data;
+  }
+
+  async miResena(peliculaId: number, clienteId: string): Promise<Resena | null> {
+    const { data, error } = await this.supabase
+      .from('resenas')
+      .select('id, pelicula_id, cliente_id, estrellas, comentario, creada_en, clientes ( nombre, apellido )')
+      .eq('pelicula_id', peliculaId)
+      .eq('cliente_id', clienteId)
+      .maybeSingle();
+    if (error) throw error;
+    return data as any;
+  }
+
+  async guardarResena(peliculaId: number, clienteId: string, estrellas: number, comentario: string) {
+    const { error } = await this.supabase
+      .from('resenas')
+      .upsert(
+        { pelicula_id: peliculaId, cliente_id: clienteId, estrellas, comentario },
+        { onConflict: 'pelicula_id,cliente_id' }
+      );
+    if (error) throw error;
+  }
+
+  async eliminarResena(id: number) {
+    const { error } = await this.supabase.from('resenas').delete().eq('id', id);
     if (error) throw error;
   }
 }
