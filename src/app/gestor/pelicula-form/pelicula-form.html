@@ -1,0 +1,47 @@
+<h1>{{ peliculaId() ? 'Editar película' : 'Nueva película' }}</h1>
+
+<form [formGroup]="form" (ngSubmit)="guardar()">
+  <input formControlName="nombre" placeholder="Nombre" />
+  <textarea formControlName="sinopsis" placeholder="Sinopsis"></textarea>
+
+  <label>
+    Duración (minutos)
+    <input type="number" formControlName="duracionMinutos" />
+  </label>
+
+  <select formControlName="restriccionEdad">
+    <option [ngValue]="0">Sin restricción</option>
+    <option [ngValue]="13">+13</option>
+    <option [ngValue]="18">+18</option>
+  </select>
+
+  <label>
+    <input type="checkbox" formControlName="visibleEnHome" />
+    Visible en la home
+  </label>
+
+  <fieldset>
+    <legend>Géneros</legend>
+    @for (g of generosDisponibles(); track g.id) {
+      <label>
+        <input
+          type="checkbox"
+          [checked]="generosSeleccionados().has(g.id)"
+          (change)="alternarGenero(g.id)"
+        />
+        {{ g.nombre }}
+      </label>
+    }
+  </fieldset>
+
+  @if (imagenActualUrl(); as url) {
+    <img [src]="url" alt="Imagen actual" width="120" />
+  }
+  <input type="file" accept="image/*" (change)="archivoSeleccionado($event)" />
+
+  @if (error()) {
+    <p>{{ error() }}</p>
+  }
+
+  <button type="submit" [disabled]="form.invalid || guardando()">Guardar</button>
+</form>

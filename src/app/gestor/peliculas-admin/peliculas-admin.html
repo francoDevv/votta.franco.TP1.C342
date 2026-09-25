@@ -1,0 +1,29 @@
+<h1>Gestión de películas</h1>
+<a routerLink="/gestor/peliculas/nuevo">+ Nueva película</a>
+
+@if (cargando()) {
+  <p>Cargando…</p>
+} @else {
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre</th><th>Duración</th><th>Restricción</th><th>Visible</th><th>Géneros</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (p of peliculas(); track p.id) {
+        <tr>
+          <td>{{ p.nombre }}</td>
+          <td>{{ p.duracion_minutos }} min</td>
+          <td>{{ p.restriccion_edad > 0 ? '+' + p.restriccion_edad : 'Sin restricción' }}</td>
+          <td>{{ p.visible_en_home ? 'Sí' : 'No' }}</td>
+          <td>{{ p.generos.map(g => g.nombre).join(', ') }}</td>
+          <td>
+            <a [routerLink]="['/gestor/peliculas', p.id]">Editar</a>
+            <button (click)="eliminar(p)">Eliminar</button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}
