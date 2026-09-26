@@ -1,0 +1,69 @@
+<h1>Nueva función</h1>
+
+<form [formGroup]="form" (ngSubmit)="guardar()">
+  <select formControlName="peliculaId">
+    <option [ngValue]="0" disabled>Elegí una película</option>
+    @for (p of peliculas(); track p.id) {
+      <option [ngValue]="p.id">{{ p.nombre }}</option>
+    }
+  </select>
+
+  <fieldset>
+    <legend>Días de la semana</legend>
+    @for (d of dias; track d.valor) {
+      <label>
+        <input type="checkbox" [checked]="diasSeleccionados().has(d.valor)" (change)="alternarDia(d.valor)" />
+        {{ d.nombre }}
+      </label>
+    }
+  </fieldset>
+
+  <label>
+    Hora
+    <input type="time" formControlName="hora" />
+  </label>
+
+  <label>
+    Desde
+    <input type="date" formControlName="fechaDesde" />
+  </label>
+
+  <label>
+    Hasta
+    <input type="date" formControlName="fechaHasta" />
+  </label>
+
+  <select formControlName="formato">
+    <option value="2D">2D</option>
+    <option value="3D">3D</option>
+    <option value="4D">4D</option>
+    <option value="5D">5D</option>
+  </select>
+
+  <select formControlName="idioma">
+    <option value="castellano">Castellano</option>
+    <option value="subtitulada">Subtitulada</option>
+  </select>
+
+  @if (error()) {
+    <p>{{ error() }}</p>
+  }
+
+  <button type="submit" [disabled]="guardando()">Crear funciones</button>
+</form>
+
+@if (resultado(); as r) {
+  <h2>Resultado</h2>
+  <ul>
+    @for (item of r; track item.fecha) {
+      <li>
+        {{ item.fecha }}:
+        @if (item.asignada) {
+          asignada a la sala {{ item.sala_id }}
+        } @else {
+          <strong>sin sala disponible</strong>
+        }
+      </li>
+    }
+  </ul>
+}

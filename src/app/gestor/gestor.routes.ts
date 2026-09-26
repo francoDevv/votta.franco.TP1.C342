@@ -17,4 +17,12 @@ export const GESTOR_ROUTES: Routes = [
         path: 'salas/:id',
         loadComponent: () => import('./sala-mapa/sala-mapa').then(m => m.SalaMapa),
     },
+    {
+        path: 'funciones',
+        loadComponent: () => import('./funciones-admin/funciones-admin').then(m => m.FuncionesAdmin),
+    },
+    {
+        path: 'funciones/nueva',
+        loadComponent: () => import('./funcion-form/funcion-form').then(m => m.FuncionForm),
+    },
 ];
