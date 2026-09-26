@@ -1,0 +1,6 @@
+.fila { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.etiqueta { width: 30px; font-weight: bold; }
+.columna { display: flex; gap: 4px; margin-right: 16px; }
+.butaca { border: 1px solid #999; border-radius: 4px; padding: 2px 6px; font-size: 12px; }
+.fila.accesible .butaca { background: #cce5ff; }
+.fila.vip .butaca { background: #ffe5b4; }

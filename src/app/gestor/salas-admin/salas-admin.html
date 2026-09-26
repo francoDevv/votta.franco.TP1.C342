@@ -1,0 +1,27 @@
+<h1>Salas</h1>
+
+<input
+  [value]="nombreNuevo()"
+  (input)="nombreNuevo.set($any($event.target).value)"
+  placeholder="Nombre de la sala (ej: Sala 1)"
+/>
+<button (click)="crear()" [disabled]="creando() || !nombreNuevo().trim()">Crear sala</button>
+@if (error()) {
+  <p>{{ error() }}</p>
+}
+
+@if (cargando()) {
+  <p>Cargando…</p>
+} @else {
+  <ul>
+    @for (s of salas(); track s.id) {
+      <li>
+        {{ s.nombre }}
+        <a [routerLink]="['/gestor/salas', s.id]">Ver mapa</a>
+        <button (click)="eliminar(s)">Eliminar</button>
+      </li>
+    } @empty {
+      <li>No hay salas creadas todavía.</li>
+    }
+  </ul>
+}

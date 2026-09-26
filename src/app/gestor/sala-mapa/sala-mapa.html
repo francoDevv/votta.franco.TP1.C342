@@ -1,0 +1,18 @@
+<h1>Mapa de butacas</h1>
+
+@if (cargando()) {
+  <p>Cargando…</p>
+} @else {
+  @for (f of filas(); track f.fila) {
+    <div class="fila" [class]="f.tipo">
+      <span class="etiqueta">{{ f.fila }}</span>
+      @for (columna of f.columnas; track $index) {
+        <div class="columna">
+          @for (b of columna; track b.id) {
+            <span class="butaca">{{ b.numero }}</span>
+          }
+        </div>
+      }
+    </div>
+  }
+}

@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MiComponente } from './mi-componente';
+import { SalaMapa } from './sala-mapa';
 
-describe('MiComponente', () => {
-  let component: MiComponente;
-  let fixture: ComponentFixture<MiComponente>;
+describe('SalaMapa', () => {
+  let component: SalaMapa;
+  let fixture: ComponentFixture<SalaMapa>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MiComponente],
+      imports: [SalaMapa],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(MiComponente);
+    fixture = TestBed.createComponent(SalaMapa);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
