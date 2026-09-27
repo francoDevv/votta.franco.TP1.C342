@@ -1,11 +1,11 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PeliculasService, Genero } from '../../services/peliculas.service';
 
 @Component({
   selector: 'app-pelicula-form',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './pelicula-form.html',
   styleUrl: './pelicula-form.css',
 })
@@ -66,6 +66,11 @@ export class PeliculaForm implements OnInit {
   archivoSeleccionado(event: Event) {
     const input = event.target as HTMLInputElement;
     this.archivoImagen.set(input.files?.[0] ?? null);
+  }
+
+  quitarImagen(inputEl: HTMLInputElement) {
+    this.archivoImagen.set(null);
+    inputEl.value = '';
   }
 
   async guardar() {

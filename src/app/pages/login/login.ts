@@ -1,7 +1,7 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
-import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -11,6 +11,7 @@ import { RouterLink } from '@angular/router';
 })
 export class Login {
   private fb = inject(FormBuilder).nonNullable;
+  private router = inject(Router);
   protected auth = inject(AuthService);
 
   form = this.fb.group({
@@ -20,6 +21,17 @@ export class Login {
 
   error = signal('');
   enviando = signal(false);
+  private yaRedirigido = false;
+
+  constructor() {
+    // Apenas se sabe que hay sesión (recién logueado, o ya la tenía al entrar a /login), redirige.
+    effect(() => {
+      if (!this.auth.cargando() && this.auth.logueado() && !this.yaRedirigido) {
+        this.yaRedirigido = true;
+        setTimeout(() => this.router.navigateByUrl('/cartelera'), 900);
+      }
+    });
+  }
 
   async entrar() {
     if (this.form.invalid) return;
@@ -34,9 +46,5 @@ export class Login {
     } finally {
       this.enviando.set(false);
     }
-  }
-
-  async salir() {
-    await this.auth.cerrarSesion();
   }
 }

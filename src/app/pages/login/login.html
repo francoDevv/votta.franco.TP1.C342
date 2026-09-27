@@ -1,18 +1,31 @@
-<h1>Ingresar</h1>
+<div class="card" style="max-width: 380px; margin: 40px auto;">
+  <h1>Ingresar</h1>
 
-@if (auth.cargando()) {
+  @if (auth.cargando()) {
     <p>Cargando…</p>
-    } @else if (auth.logueado()) {
-    <p>Sesión iniciada como {{ auth.usuario()?.email }} · rol: <strong>{{ auth.rol() }}</strong></p>
-    <button (click)="salir()">Cerrar sesión</button>
-    } @else {
-    <a routerLink="/registro">Crear cuenta</a>
+  } @else if (auth.logueado()) {
+    <p>Sesión iniciada como {{ auth.usuario()?.email }}</p>
+    <p class="chip">Rol: <b>{{ auth.rol() }}</b></p>
+    <p class="ticket-meta">Redirigiendo…</p>
+  } @else {
     <form [formGroup]="form" (ngSubmit)="entrar()">
-        <input type="email" formControlName="email" placeholder="Mail" />
-        <input type="password" formControlName="password" placeholder="Contraseña" />
-        @if (error()) {
-        <small>{{ error() }}</small>
-        }
-        <button [disabled]="form.invalid || enviando()">Entrar</button>
+      <div class="field">
+        <label>Mail</label>
+        <input type="email" formControlName="email" placeholder="tu@mail.com" />
+      </div>
+      <div class="field">
+        <label>Contraseña</label>
+        <input type="password" formControlName="password" placeholder="••••••••" />
+      </div>
+
+      @if (error()) {
+        <p class="form-error">{{ error() }}</p>
+      }
+
+      <div class="row">
+        <button type="submit" class="btn btn-primary" [disabled]="form.invalid || enviando()">Entrar</button>
+        <a routerLink="/registro" class="btn btn-ghost">Crear cuenta</a>
+      </div>
     </form>
-    }
+  }
+</div>

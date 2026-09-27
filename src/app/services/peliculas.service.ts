@@ -148,11 +148,11 @@ export class PeliculasService {
   async listarResenas(peliculaId: number): Promise<Resena[]> {
     const { data, error } = await this.supabase
       .from('resenas')
-      .select('id, pelicula_id, cliente_id, estrellas, comentario, creada_en, clientes ( nombre, apellido )')
+      .select('id, pelicula_id, cliente_id, estrellas, comentario, creada_en')
       .eq('pelicula_id', peliculaId)
       .order('creada_en', { ascending: false });
     if (error) throw error;
-    return (data ?? []) as any;
+    return this.conNombresDeCliente(data ?? []);
   }
 
   async obtenerPromedio(peliculaId: number): Promise<{ promedio: number; cantidad: number } | null> {
@@ -168,12 +168,14 @@ export class PeliculasService {
   async miResena(peliculaId: number, clienteId: string): Promise<Resena | null> {
     const { data, error } = await this.supabase
       .from('resenas')
-      .select('id, pelicula_id, cliente_id, estrellas, comentario, creada_en, clientes ( nombre, apellido )')
+      .select('id, pelicula_id, cliente_id, estrellas, comentario, creada_en')
       .eq('pelicula_id', peliculaId)
       .eq('cliente_id', clienteId)
       .maybeSingle();
     if (error) throw error;
-    return data as any;
+    if (!data) return null;
+    const [conNombre] = await this.conNombresDeCliente([data]);
+    return conNombre;
   }
 
   async guardarResena(peliculaId: number, clienteId: string, estrellas: number, comentario: string) {
@@ -189,5 +191,20 @@ export class PeliculasService {
   async eliminarResena(id: number) {
     const { error } = await this.supabase.from('resenas').delete().eq('id', id);
     if (error) throw error;
+  }
+
+  private async conNombresDeCliente(resenas: any[]): Promise<Resena[]> {
+    if (resenas.length === 0) return [];
+    const ids = Array.from(new Set(resenas.map((r) => r.cliente_id)));
+    const { data: clientesData, error } = await this.supabase
+      .from('clientes_publicos')
+      .select('id, nombre, apellido')
+      .in('id', ids);
+    if (error) throw error;
+    const porId = new Map((clientesData ?? []).map((c) => [c.id, c]));
+    return resenas.map((r) => ({
+      ...r,
+      clientes: porId.get(r.cliente_id) ?? { nombre: 'Usuario', apellido: '' },
+    }));
   }
 }

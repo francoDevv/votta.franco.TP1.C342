@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { SalasService, Butaca } from '../../services/salas.service';
+import { RouterLink } from '@angular/router';
 
 interface FilaAgrupada {
   fila: string;
@@ -10,7 +11,7 @@ interface FilaAgrupada {
 
 @Component({
   selector: 'app-sala-mapa',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './sala-mapa.html',
   styleUrl: './sala-mapa.css',
 })

@@ -1,18 +1,28 @@
+<a routerLink="/gestor/salas" class="back-link">‹ Volver a salas</a>
+
 <h1>Mapa de butacas</h1>
+
+<div class="row" style="margin-bottom: 20px;">
+  <span class="row"><span class="seat seat-static seat-libre">A1</span> Normal</span>
+  <span class="row"><span class="seat seat-static seat-accesible">JK</span> Accesible</span>
+  <span class="row"><span class="seat seat-static seat-vip">R1</span> VIP</span>
+</div>
 
 @if (cargando()) {
   <p>Cargando…</p>
 } @else {
-  @for (f of filas(); track f.fila) {
-    <div class="fila" [class]="f.tipo">
-      <span class="etiqueta">{{ f.fila }}</span>
-      @for (columna of f.columnas; track $index) {
-        <div class="columna">
-          @for (b of columna; track b.id) {
-            <span class="butaca">{{ b.numero }}</span>
-          }
-        </div>
-      }
-    </div>
-  }
+  <div class="mapa-sala">
+    @for (f of filas(); track f.fila) {
+      <div class="fila-butacas">
+        <span class="fila-label">{{ f.fila }}</span>
+        @for (columna of f.columnas; track $index) {
+            <div class="columna-butacas" [class.col-extremo]="$index === 0 || $index === 2" [class.col-medio]="$index === 1">
+                @for (b of columna; track b.id) {
+                <span class="seat seat-static" [class.seat-libre]="b.tipo === 'normal'" [class.seat-accesible]="b.tipo === 'accesible'" [class.seat-vip]="b.tipo === 'vip'">{{ b.numero }}</span>
+                }
+            </div>
+        }
+      </div>
+    }
+  </div>
 }

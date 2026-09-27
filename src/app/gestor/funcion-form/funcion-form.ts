@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FuncionesService, ResultadoAsignacion } from '../../services/funciones.service';
 import { PeliculasService, Pelicula } from '../../services/peliculas.service';
 
@@ -12,7 +12,7 @@ const DIAS = [
 
 @Component({
   selector: 'app-funcion-form',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './funcion-form.html',
   styleUrl: './funcion-form.css',
 })

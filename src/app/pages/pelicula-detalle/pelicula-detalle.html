@@ -1,55 +1,69 @@
 @if (cargando()) {
   <p>Cargando…</p>
 } @else if (pelicula(); as p) {
-  @if (urlImagen(p.imagen_url); as url) {
-    <img [src]="url" [alt]="p.nombre" />
-  }
-  <h1>{{ p.nombre }}</h1>
-  <p>{{ p.sinopsis }}</p>
-  <p>{{ p.duracion_minutos }} min</p>
-  @if (p.restriccion_edad > 0) {
-    <p>+{{ p.restriccion_edad }}</p>
-  }
-  <p>{{ p.generos.map(g => g.nombre).join(', ') }}</p>
+    <a routerLink="/cartelera" class="back-link">‹ Volver a la cartelera</a>
+  <div class="detalle-pelicula">
+    <div class="detalle-poster">
+      @if (urlImagen(p.imagen_url); as url) {
+        <img [src]="url" [alt]="p.nombre" />
+      } @else {
+        <div class="detalle-poster-placeholder">Sin imagen</div>
+      }
+    </div>
 
-  @if (promedio(); as prom) {
-    <p>⭐ {{ prom.promedio }} ({{ prom.cantidad }} reseñas)</p>
-  } @else {
-    <p>Sin reseñas todavía</p>
-  }
+    <div class="detalle-info">
+      <h1>{{ p.nombre }}</h1>
+      <p class="ticket-meta">{{ p.duracion_minutos }} min · {{ p.generos.map(g => g.nombre).join(', ') }}</p>
+      @if (p.restriccion_edad > 0) {
+        <p class="chip">+{{ p.restriccion_edad }}</p>
+      }
+      <p>{{ p.sinopsis }}</p>
+
+      @if (promedio(); as prom) {
+        <p class="chip">⭐ {{ prom.promedio }} ({{ prom.cantidad }} reseñas)</p>
+      } @else {
+        <p class="ticket-meta">Sin reseñas todavía</p>
+      }
+    </div>
+  </div>
 
   <h2>Reseñas</h2>
-  @for (r of resenas(); track r.id) {
-    <article>
-      <strong>{{ r.clientes.nombre }} {{ r.clientes.apellido }}</strong>
-      <span>{{ '⭐'.repeat(r.estrellas) }}</span>
-      <p>{{ r.comentario }}</p>
-    </article>
-  } @empty {
-    <p>Todavía no hay reseñas para esta película.</p>
-  }
+  <div class="resenas-lista">
+    @for (r of resenas(); track r.id) {
+      <article class="card">
+        <strong>{{ r.clientes.nombre }} {{ r.clientes.apellido }}</strong>
+        <p class="ticket-meta">{{ '⭐'.repeat(r.estrellas) }}</p>
+        <p>{{ r.comentario }}</p>
+      </article>
+    } @empty {
+      <p>Todavía no hay reseñas para esta película.</p>
+    }
+  </div>
 
   @if (auth.rol() === 'cliente') {
-    <h3>{{ miResena() ? 'Editar mi reseña' : 'Dejar una reseña' }}</h3>
-    <form (ngSubmit)="guardarResena()">
-      <select [(ngModel)]="estrellasNuevas" name="estrellas">
-        @for (n of [1, 2, 3, 4, 5]; track n) {
-          <option [ngValue]="n">{{ n }} ⭐</option>
+    <div class="card" style="max-width: 480px;">
+      <h3>{{ miResena() ? 'Editar mi reseña' : 'Dejar una reseña' }}</h3>
+      <form (ngSubmit)="guardarResena()">
+        <div class="field">
+          <label>Calificación</label>
+          <select [(ngModel)]="estrellasNuevas" name="estrellas">
+            @for (n of [1, 2, 3, 4, 5]; track n) {
+              <option [ngValue]="n">{{ n }} ⭐</option>
+            }
+          </select>
+        </div>
+        <div class="field">
+          <label>Comentario</label>
+          <textarea [(ngModel)]="comentarioNuevo" name="comentario" maxlength="300" placeholder="Máx. 300 caracteres"></textarea>
+        </div>
+        @if (errorResena()) {
+          <p class="form-error">{{ errorResena() }}</p>
         }
-      </select>
-      <textarea
-        [(ngModel)]="comentarioNuevo"
-        name="comentario"
-        maxlength="300"
-        placeholder="Tu comentario (máx. 300 caracteres)"
-      ></textarea>
-      @if (errorResena()) {
-        <p>{{ errorResena() }}</p>
-      }
-      <button type="submit" [disabled]="guardandoResena() || !comentarioNuevo().trim()">
-        {{ miResena() ? 'Actualizar reseña' : 'Publicar reseña' }}
-      </button>
-    </form>
+        <button type="submit" class="btn btn-primary" [disabled]="guardandoResena() || !comentarioNuevo().trim()">
+          {{ miResena() ? 'Actualizar reseña' : 'Publicar reseña' }}
+        </button>
+      </form>
+    </div>
   }
 } @else {
   <p>Película no encontrada.</p>

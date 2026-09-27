@@ -1,12 +1,12 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { PeliculasService, Pelicula, Resena } from '../../services/peliculas.service';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-pelicula-detalle',
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   templateUrl: './pelicula-detalle.html',
   styleUrl: './pelicula-detalle.css',
 })

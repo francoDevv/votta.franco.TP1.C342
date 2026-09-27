@@ -1,18 +1,19 @@
-<h1>Mi perfil</h1>
+<div class="card" style="max-width: 420px;">
+  <h1>Mi perfil</h1>
+  <p>Mail: {{ auth.usuario()?.email }}</p>
+  <p class="chip">Rol: <b>{{ auth.rol() }}</b></p>
 
-<p>Mail: {{ auth.usuario()?.email }}</p>
-<p>Rol: {{ auth.rol() }}</p>
-
-@if (auth.rol() === 'cliente') {
-  @if (cargandoDatos()) {
-    <p>Cargando datos…</p>
-  } @else if (datosCliente(); as d) {
-    <p>Nombre: {{ d.nombre }} {{ d.apellido }}</p>
-    <p>Fecha de nacimiento: {{ d.fecha_nacimiento }}</p>
-    <p>Tipo de sangre: {{ d.tipo_sangre }}</p>
-    <p>Color de ojos: {{ d.color_ojos }}</p>
-    <p>Días de vacaciones por año: {{ d.dias_vacaciones }}</p>
+  @if (auth.rol() === 'cliente') {
+    @if (cargandoDatos()) {
+      <p>Cargando datos…</p>
+    } @else if (datosCliente(); as d) {
+      <p>Nombre: {{ d.nombre }} {{ d.apellido }}</p>
+      <p>Fecha de nacimiento: {{ d.fecha_nacimiento }}</p>
+      <p>Tipo de sangre: {{ d.tipo_sangre }}</p>
+      <p>Color de ojos: {{ d.color_ojos }}</p>
+      <p>Días de vacaciones por año: {{ d.dias_vacaciones }}</p>
+    }
   }
-}
 
-<button (click)="salir()">Cerrar sesión</button>
+  <button class="btn btn-ghost" (click)="salir()">Cerrar sesión</button>
+</div>

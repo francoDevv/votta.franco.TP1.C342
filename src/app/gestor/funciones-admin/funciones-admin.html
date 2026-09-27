@@ -1,5 +1,7 @@
-<h1>Funciones</h1>
-<a routerLink="/gestor/funciones/nueva">+ Nueva función</a>
+<div class="row" style="justify-content: space-between; margin-bottom: 20px;">
+  <h1 style="margin: 0;">Funciones</h1>
+  <a routerLink="/gestor/funciones/nueva" class="btn btn-primary">+ Nueva función</a>
+</div>
 
 @if (cargando()) {
   <p>Cargando…</p>
@@ -16,7 +18,7 @@
           <td>{{ f.inicio | date: 'dd/MM HH:mm' }}</td>
           <td>{{ f.formato }}</td>
           <td>{{ f.idioma }}</td>
-          <td><button (click)="eliminar(f)">Eliminar</button></td>
+          <td><button class="btn btn-danger" (click)="eliminar(f)">Eliminar</button></td>
         </tr>
       } @empty {
         <tr><td colspan="6">No hay funciones próximas.</td></tr>

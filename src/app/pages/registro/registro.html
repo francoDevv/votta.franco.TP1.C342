@@ -1,33 +1,49 @@
-<h1>Crear cuenta</h1>
+<div class="card" style="max-width: 480px; margin: 40px auto;">
+  <h1>Crear cuenta</h1>
 
-<form [formGroup]="form" (ngSubmit)="registrar()">
-  <input type="email" formControlName="email" placeholder="Mail" />
-  <input type="password" formControlName="password" placeholder="Contraseña (mín. 6 caracteres)" />
-  <input formControlName="nombre" placeholder="Nombre" />
-  <input formControlName="apellido" placeholder="Apellido" />
+  <form [formGroup]="form" (ngSubmit)="registrar()">
+    <div class="field">
+      <label>Mail</label>
+      <input type="email" formControlName="email" />
+    </div>
+    <div class="field">
+      <label>Contraseña</label>
+      <input type="password" formControlName="password" placeholder="Mínimo 6 caracteres" />
+    </div>
+    <div class="field">
+      <label>Nombre</label>
+      <input formControlName="nombre" />
+    </div>
+    <div class="field">
+      <label>Apellido</label>
+      <input formControlName="apellido" />
+    </div>
+    <div class="field">
+      <label>Fecha de nacimiento</label>
+      <input type="date" formControlName="fechaNacimiento" />
+    </div>
+    <div class="field">
+      <label>Tipo de sangre</label>
+      <select formControlName="tipoSangre">
+        <option value="" disabled selected>Elegí una opción</option>
+        @for (t of tiposSangre; track t) {
+          <option [value]="t">{{ t }}</option>
+        }
+      </select>
+    </div>
+    <div class="field">
+      <label>Color de ojos</label>
+      <input formControlName="colorOjos" />
+    </div>
+    <div class="field">
+      <label>Días de vacaciones por año</label>
+      <input type="number" formControlName="diasVacaciones" />
+    </div>
 
-  <label>
-    Fecha de nacimiento
-    <input type="date" formControlName="fechaNacimiento" />
-  </label>
-
-  <select formControlName="tipoSangre">
-    <option value="" disabled selected>Tipo de sangre</option>
-    @for (t of tiposSangre; track t) {
-      <option [value]="t">{{ t }}</option>
+    @if (error()) {
+      <p class="form-error">{{ error() }}</p>
     }
-  </select>
 
-  <input formControlName="colorOjos" placeholder="Color de ojos" />
-
-  <label>
-    Días de vacaciones por año
-    <input type="number" formControlName="diasVacaciones" />
-  </label>
-
-  @if (error()) {
-    <p>{{ error() }}</p>
-  }
-
-  <button [disabled]="form.invalid || enviando()">Crear cuenta</button>
-</form>
+    <button type="submit" class="btn btn-primary" [disabled]="form.invalid || enviando()">Crear cuenta</button>
+  </form>
+</div>

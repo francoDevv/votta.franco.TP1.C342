@@ -1,1 +1,362 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --bg: #1A1412;
+  --surface: #241C19;
+  --surface-alt: #2C2320;
+  --border: #3D2F2E;
+  --text: #F1EAE4;
+  --text-muted: #B8A29A;
+  --accent: #D73220;
+  --accent-strong: #8A2015;
+  --highlight: #E8A33D;
+  --info: #5FA396;
+  --seat-libre: #4A3D38;
+  --seat-libre-border: #6B5A52;
+  --seat-ocupada: #17110F;
+  --seat-ocupada-border: #221A17;
+  --seat-ocupada-text: #5C5049;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --font-body: 'Nunito Sans', 'Verdana', sans-serif;
+  --font-display: 'Big Shoulders Display', 'Arial Narrow', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+h1, h2, h3, h4 {
+  font-weight: 800;
+  margin: 0 0 16px;
+  line-height: 1.2;
+}
+
+h1 { font-size: 28px; }
+h2 { font-size: 22px; }
+h3 { font-size: 18px; }
+
+p { margin: 0 0 12px; }
+
+a {
+  color: var(--highlight);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 22px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 14px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-strong);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border);
+}
+.btn-ghost:hover:not(:disabled) {
+  border-color: var(--text-muted);
+}
+
+.btn-danger {
+  background: transparent;
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.btn-danger:hover:not(:disabled) {
+  background: var(--accent);
+  color: #fff;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+  flex: 1;
+  min-width: 160px;
+}
+.field label {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+input:not([type=checkbox]):not([type=radio]), select, textarea {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+input:not([type=checkbox]):not([type=radio])::placeholder, select::placeholder, textarea::placeholder {
+  color: var(--text-muted);
+}
+
+input[type=checkbox], input[type=radio] {
+  width: auto;
+  accent-color: var(--accent);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-error {
+  color: var(--accent);
+  font-size: 13px;
+  margin: 4px 0 12px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+
+.ticket-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.ticket-card .ticket-poster {
+  aspect-ratio: 2/3;
+  background: linear-gradient(135deg, var(--border), var(--surface));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 13px;
+  overflow: hidden;
+}
+.ticket-card .ticket-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ticket-card .ticket-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: var(--highlight);
+  color: var(--bg);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 9px;
+  border-radius: var(--radius-sm);
+}
+.ticket-card .ticket-body {
+  padding: 14px;
+  flex: 1;
+}
+.ticket-card .ticket-title {
+  font-weight: 800;
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+.ticket-card .ticket-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+}
+.ticket-card .ticket-perforation {
+  height: 0;
+  border-top: 2px dashed var(--border);
+  position: relative;
+  margin: 0 14px;
+}
+.ticket-card .ticket-perforation::before, .ticket-card .ticket-perforation::after {
+  content: "";
+  position: absolute;
+  top: -8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+.ticket-card .ticket-perforation::before {
+  left: -22px;
+}
+.ticket-card .ticket-perforation::after {
+  right: -22px;
+}
+.ticket-card .ticket-footer {
+  padding: 12px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+table th, table td {
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border);
+}
+table th {
+  background: var(--surface-alt);
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 13px;
+}
+table tbody tr:hover {
+  background: var(--surface-alt);
+}
+
+.seat {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+.seat.seat-libre {
+  background: var(--seat-libre);
+  border-color: var(--seat-libre-border);
+  color: var(--text);
+}
+.seat.seat-seleccionada {
+  background: var(--accent);
+  color: #fff;
+}
+.seat.seat-vip {
+  background: var(--highlight);
+  color: var(--bg);
+}
+.seat.seat-accesible {
+  background: var(--info);
+  color: var(--bg);
+}
+.seat.seat-static {
+  cursor: default;
+}
+.seat.seat-ocupada {
+  background: repeating-linear-gradient(45deg, var(--seat-ocupada), var(--seat-ocupada) 3px, #1D1613 3px, #1D1613 6px);
+  color: var(--seat-ocupada-text);
+  border-color: var(--seat-ocupada-border);
+  cursor: not-allowed;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.grid-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.chip b {
+  color: var(--text);
+}
+
+label.chip {
+  cursor: pointer;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+.back-link:hover { color: var(--text); }
+
+.file-input-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

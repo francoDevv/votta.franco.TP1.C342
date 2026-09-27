@@ -1,1 +1,25 @@
-<router-outlet />
+<nav class="navbar">
+  <div class="row">
+    <a routerLink="/cartelera" class="brand">CINE <span>NOCTURNO</span></a>
+    @if (!auth.cargando() && (auth.rol() === 'gestor' || auth.rol() === 'admin')) {
+      <a routerLink="/gestor/peliculas" class="nav-link">Películas</a>
+      <a routerLink="/gestor/salas" class="nav-link">Salas</a>
+      <a routerLink="/gestor/funciones" class="nav-link">Funciones</a>
+    }
+  </div>
+
+  @if (!auth.cargando()) {
+    @if (auth.logueado()) {
+      <div class="row">
+        <span class="chip">Rol: <b>{{ auth.rol() }}</b></span>
+        <a routerLink="/perfil" class="btn btn-ghost">Mi perfil</a>
+      </div>
+    } @else {
+      <a routerLink="/login" class="btn btn-primary">Ingresar</a>
+    }
+  }
+</nav>
+
+<main class="container">
+  <router-outlet />
+</main>
