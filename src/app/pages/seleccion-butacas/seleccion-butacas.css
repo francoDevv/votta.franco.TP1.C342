@@ -1,0 +1,7 @@
+.mapa-sala { display: flex; flex-direction: column; gap: 6px; overflow-x: auto; padding-bottom: 16px; margin-bottom: 20px; }
+.fila-butacas { display: flex; align-items: center; gap: 8px; }
+.fila-label { width: 28px; font-weight: 800; color: var(--text-muted); flex-shrink: 0; }
+.columna-butacas { display: flex; gap: 4px; margin-right: 18px; }
+.columna-butacas.col-extremo { width: 116px; justify-content: center; }
+.columna-butacas.col-medio { width: 596px; justify-content: center; }
+.resumen-compra { max-width: 480px; }

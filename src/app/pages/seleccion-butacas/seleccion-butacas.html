@@ -1,0 +1,57 @@
+<a [routerLink]="['/peliculas', funcion()?.pelicula_id, 'funciones']" class="back-link">‹ Volver a funciones</a>
+
+@if (cargando()) {
+  <p>Cargando…</p>
+} @else if (funcion(); as f) {
+  <h1>{{ f.peliculas.nombre }}</h1>
+  <p class="ticket-meta">{{ f.salas.nombre }} · {{ f.inicio | date: 'dd/MM/yyyy · HH:mm' }} · {{ f.formato }} · {{ f.idioma }}</p>
+
+  <div class="row" style="margin: 16px 0;">
+    <span class="row"><span class="seat seat-static seat-libre">A1</span> Libre</span>
+    <span class="row"><span class="seat seat-static seat-accesible">JK</span> Accesible</span>
+    <span class="row"><span class="seat seat-static seat-vip">R1</span> VIP</span>
+    <span class="row"><span class="seat seat-static seat-seleccionada">✓</span> Tu selección</span>
+    <span class="row"><span class="seat seat-static seat-ocupada">×</span> No disponible</span>
+  </div>
+
+  @if (error()) {
+    <p class="form-error">{{ error() }}</p>
+  }
+
+  <div class="mapa-sala">
+    @for (fila of filas(); track fila.fila) {
+      <div class="fila-butacas">
+        <span class="fila-label">{{ fila.fila }}</span>
+        @for (columna of fila.columnas; track $index) {
+          <div class="columna-butacas" [class.col-extremo]="$index === 0 || $index === 2" [class.col-medio]="$index === 1">
+            @for (b of columna; track b.id) {
+              <span
+                class="seat"
+                [class]="claseButaca(b)"
+                [class.seat-static]="!puedeClickear(b)"
+                (click)="alternar(b)"
+              >{{ b.numero }}</span>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="card resumen-compra">
+    @if (seleccionActual().length === 0) {
+      <p class="ticket-meta">Elegí al menos una butaca para continuar.</p>
+    } @else {
+      <div class="row" style="justify-content: space-between;">
+        <div>
+          <strong>{{ seleccionActual().length }} butaca(s):</strong>
+          <span class="ticket-meta">{{ seleccionActual().map(b => b.fila + b.numero).join(', ') }}</span>
+        </div>
+        <strong>Total: ${{ total() }}</strong>
+      </div>
+      <button class="btn btn-primary" disabled style="margin-top: 12px;" title="Próximamente: candy y pago">
+        Continuar con la compra
+      </button>
+    }
+  </div>
+}

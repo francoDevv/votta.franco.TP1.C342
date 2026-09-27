@@ -63,4 +63,25 @@ export class FuncionesService {
     const { error } = await this.supabase.from('funciones').delete().eq('id', id);
     if (error) throw error;
   }
+
+  async listarPorPelicula(peliculaId: number): Promise<Funcion[]> {
+    const { data, error } = await this.supabase
+      .from('funciones')
+      .select('id, pelicula_id, sala_id, inicio, fin, formato, idioma, peliculas ( nombre ), salas ( nombre )')
+      .eq('pelicula_id', peliculaId)
+      .gte('inicio', new Date().toISOString())
+      .order('inicio');
+    if (error) throw error;
+    return (data ?? []) as any;
+  }
+
+  async obtenerPorId(id: number): Promise<Funcion | null> {
+    const { data, error } = await this.supabase
+      .from('funciones')
+      .select('id, pelicula_id, sala_id, inicio, fin, formato, idioma, peliculas ( nombre ), salas ( nombre )')
+      .eq('id', id)
+      .maybeSingle();
+    if (error) throw error;
+    return data as any;
+  }
 }

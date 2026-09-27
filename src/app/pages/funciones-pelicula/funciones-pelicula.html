@@ -1,0 +1,24 @@
+<a [routerLink]="['/peliculas', pelicula()?.id]" class="back-link">‹ Volver a la película</a>
+
+@if (cargando()) {
+  <p>Cargando…</p>
+} @else if (pelicula(); as p) {
+  <h1>{{ p.nombre }}</h1>
+  <p class="ticket-meta">Elegí una función</p>
+
+  @if (funciones().length === 0) {
+    <p>No hay funciones programadas por el momento.</p>
+  } @else {
+    <div class="funciones-lista">
+      @for (f of funciones(); track f.id) {
+        <a [routerLink]="['/funciones', f.id, 'butacas']" class="card funcion-item">
+          <div>
+            <strong>{{ f.inicio | date: 'dd/MM/yyyy · HH:mm' }}</strong>
+            <p class="ticket-meta">{{ f.salas.nombre }} · {{ f.formato }} · {{ f.idioma }}</p>
+          </div>
+          <span class="btn btn-primary">Elegir butacas</span>
+        </a>
+      }
+    </div>
+  }
+}

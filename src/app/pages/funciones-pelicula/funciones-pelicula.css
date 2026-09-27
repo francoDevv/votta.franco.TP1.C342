@@ -1,0 +1,3 @@
+.funciones-lista { display: flex; flex-direction: column; gap: 12px; max-width: 480px; }
+.funcion-item { display: flex; align-items: center; justify-content: space-between; text-decoration: none; color: var(--text); }
+.funcion-item:hover { border-color: var(--accent); text-decoration: none; }

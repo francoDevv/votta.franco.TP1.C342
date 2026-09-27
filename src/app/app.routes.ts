@@ -29,5 +29,13 @@ export const routes: Routes = [
     path: 'peliculas/:id',
     loadComponent: () => import('./pages/pelicula-detalle/pelicula-detalle').then(m => m.PeliculaDetalle),
   },
+  {
+    path: 'peliculas/:id/funciones',
+    loadComponent: () => import('./pages/funciones-pelicula/funciones-pelicula').then(m => m.FuncionesPelicula),
+  },
+  {
+    path: 'funciones/:id/butacas',
+    loadComponent: () => import('./pages/seleccion-butacas/seleccion-butacas').then(m => m.SeleccionButacas),
+  },
   { path: '', redirectTo: 'cartelera', pathMatch: 'full' },
 ];
