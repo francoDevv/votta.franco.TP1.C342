@@ -1,0 +1,33 @@
+<div class="row" style="justify-content: space-between; margin-bottom: 20px;">
+  <h1 style="margin: 0;">Productos de candy</h1>
+  <div class="row">
+    <a routerLink="/gestor/categorias" class="btn btn-ghost">Categorías</a>
+    <a routerLink="/gestor/productos/nuevo" class="btn btn-primary">+ Nuevo producto</a>
+  </div>
+</div>
+
+@if (cargando()) {
+  <p>Cargando…</p>
+} @else {
+  <table>
+    <thead><tr><th>Nombre</th><th>Categoría</th><th>Precio</th><th>Disponible</th><th></th></tr></thead>
+    <tbody>
+      @for (p of productos(); track p.id) {
+        <tr>
+          <td>{{ p.nombre }}</td>
+          <td>{{ p.categorias_candy.nombre }}</td>
+          <td>${{ p.precio }}</td>
+          <td>{{ p.disponible ? 'Sí' : 'No' }}</td>
+          <td>
+            <div class="row">
+              <a [routerLink]="['/gestor/productos', p.id]" class="btn btn-ghost">Editar</a>
+              <button class="btn btn-danger" (click)="eliminar(p)">Eliminar</button>
+            </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr><td colspan="5">No hay productos todavía.</td></tr>
+      }
+    </tbody>
+  </table>
+}

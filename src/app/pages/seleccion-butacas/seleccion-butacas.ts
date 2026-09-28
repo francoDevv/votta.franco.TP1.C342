@@ -1,15 +1,13 @@
 import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { RealtimeChannel } from '@supabase/supabase-js';
-import { ButacasService } from '../../services/butacas.service';
+import { ButacasService, PRECIOS_BUTACA } from '../../services/butacas.service';
 import { SalasService, Butaca } from '../../services/salas.service';
 import { FuncionesService, Funcion } from '../../services/funciones.service';
 
 // Precios fijos temporales. Cuando armemos cupones/precios configurables
 // en el panel de admin, esto se reemplaza por datos reales de la base.
-const PRECIOS: Record<string, number> = { normal: 3500, accesible: 3500, vip: 5200 };
-
 interface FilaAgrupada { fila: string; columnas: Butaca[][]; }
 
 @Component({
@@ -23,6 +21,7 @@ export class SeleccionButacas implements OnInit, OnDestroy {
   private butacasService = inject(ButacasService);
   private salasService = inject(SalasService);
   private funcionesService = inject(FuncionesService);
+  private router = inject(Router);
 
   funcion = signal<Funcion | null>(null);
   butacas = signal<Butaca[]>([]);
@@ -48,7 +47,7 @@ export class SeleccionButacas implements OnInit, OnDestroy {
   });
 
   seleccionActual = computed(() => this.butacas().filter((b) => this.misButacas().has(b.id)));
-  total = computed(() => this.seleccionActual().reduce((suma, b) => suma + (PRECIOS[b.tipo] ?? 0), 0));
+  total = computed(() => this.seleccionActual().reduce((suma, b) => suma + (PRECIOS_BUTACA[b.tipo] ?? 0), 0));
 
   async ngOnInit() {
     this.funcionId = Number(this.route.snapshot.paramMap.get('id'));
@@ -115,5 +114,9 @@ export class SeleccionButacas implements OnInit, OnDestroy {
       this.error.set('Alguien más reservó esa butaca justo antes. Elegí otra.');
     }
     await this.actualizarDisponibilidad();
+  }
+
+  continuar() {
+    this.router.navigate(['/funciones', this.funcionId, 'candy']);
   }
 }

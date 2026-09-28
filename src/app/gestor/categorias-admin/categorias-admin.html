@@ -1,0 +1,28 @@
+<a routerLink="/gestor/productos" class="back-link">‹ Volver a productos</a>
+<h1>Categorías de candy</h1>
+
+<div class="row" style="margin-bottom: 16px;">
+  <input [value]="nombreNuevo()" (input)="nombreNuevo.set($any($event.target).value)" placeholder="Nombre de la categoría" />
+  <button class="btn btn-primary" (click)="crear()">Crear</button>
+</div>
+@if (error()) {
+  <p class="form-error">{{ error() }}</p>
+}
+
+@if (cargando()) {
+  <p>Cargando…</p>
+} @else {
+  <table>
+    <thead><tr><th>Nombre</th><th></th></tr></thead>
+    <tbody>
+      @for (c of categorias(); track c.id) {
+        <tr>
+          <td>{{ c.nombre }}</td>
+          <td><button class="btn btn-danger" (click)="eliminar(c)">Eliminar</button></td>
+        </tr>
+      } @empty {
+        <tr><td colspan="2">No hay categorías todavía.</td></tr>
+      }
+    </tbody>
+  </table>
+}

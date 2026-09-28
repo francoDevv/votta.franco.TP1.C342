@@ -1,31 +1,72 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, effect, inject, signal } from '@angular/core';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { SupabaseService } from './supabase.service';
+import { AuthService } from './auth.service';
 
 export interface DisponibilidadButaca {
   butaca_id: number;
   estado: 'libre' | 'reservada' | 'ocupada';
 }
 
-function obtenerSessionId(): string {
-  const KEY = 'cine_session_id';
-  let id = sessionStorage.getItem(KEY);
-  if (!id) {
-    id = crypto.randomUUID();
-    sessionStorage.setItem(KEY, id);
-  }
+const KEY = 'cine_session_id';
+
+function nuevoSessionId(): string {
+  const id = crypto.randomUUID();
+  sessionStorage.setItem(KEY, id);
   return id;
 }
+
+function obtenerSessionId(): string {
+  return sessionStorage.getItem(KEY) ?? nuevoSessionId();
+}
+
+export const PRECIOS_BUTACA: Record<string, number> = { normal: 3500, accesible: 3500, vip: 5200 };
 
 @Injectable({ providedIn: 'root' })
 export class ButacasService {
   private supabase = inject(SupabaseService).client;
-  readonly sessionId = obtenerSessionId();
+  private auth = inject(AuthService);
+
+  private _sessionId = signal(obtenerSessionId());
+  private ultimaIdentidad: string | null | undefined = undefined; // undefined = todavía no observado
+
+  get sessionId(): string {
+    return this._sessionId();
+  }
+
+  constructor() {
+    // Si cambia quién está logueado (login, logout, o cambio de cuenta) en la misma pestaña,
+    // el carrito de reservas no debe heredarse: liberamos lo viejo y arrancamos sesión nueva.
+    effect(() => {
+      if (this.auth.cargando()) return;
+      const identidadActual = this.auth.usuario()?.id ?? 'anonimo';
+
+      if (this.ultimaIdentidad !== undefined && this.ultimaIdentidad !== identidadActual) {
+        const sessionIdViejo = this._sessionId();
+        setTimeout(() => {
+          this.liberarTodas(sessionIdViejo).catch((e) =>
+            console.error('No se pudieron liberar las reservas de la sesión anterior', e)
+          );
+        }, 0);
+        this._sessionId.set(nuevoSessionId());
+      }
+      this.ultimaIdentidad = identidadActual;
+    });
+  }
 
   async disponibilidad(funcionId: number): Promise<DisponibilidadButaca[]> {
     const { data, error } = await this.supabase.rpc('disponibilidad_funcion', { p_funcion_id: funcionId });
     if (error) throw error;
     return data ?? [];
+  }
+
+  async misReservas(funcionId: number): Promise<number[]> {
+    const { data, error } = await this.supabase.rpc('mis_reservas', {
+      p_funcion_id: funcionId,
+      p_session_id: this.sessionId,
+    });
+    if (error) throw error;
+    return (data ?? []).map((r: any) => r.butaca_id);
   }
 
   async reservar(funcionId: number, butacaIds: number[]): Promise<{ butaca_id: number; reservada: boolean }[]> {
@@ -47,14 +88,10 @@ export class ButacasService {
     if (error) throw error;
   }
 
-  async misReservas(funcionId: number): Promise<number[]> {
-    const { data, error } = await this.supabase.rpc('mis_reservas', {
-        p_funcion_id: funcionId,
-        p_session_id: this.sessionId,
-    });
+  async liberarTodas(sessionId: string): Promise<void> {
+    const { error } = await this.supabase.rpc('liberar_mis_reservas', { p_session_id: sessionId });
     if (error) throw error;
-    return (data ?? []).map((r: any) => r.butaca_id);
-    }
+  }
 
   suscribirse(funcionId: number, onCambio: () => void): RealtimeChannel {
     return this.supabase

@@ -1,0 +1,38 @@
+<div class="row" style="justify-content: space-between; margin-bottom: 20px;">
+  <h1 style="margin: 0;">Cupones</h1>
+  <a routerLink="/gestor/cupones/nuevo" class="btn btn-primary">+ Nuevo cupón (+50 años)</a>
+</div>
+
+@if (error()) {
+  <p class="form-error">{{ error() }}</p>
+}
+
+@if (cargando()) {
+  <p>Cargando…</p>
+} @else {
+  <table>
+    <thead>
+      <tr><th>Nombre</th><th>A quién aplica</th><th>Descuento</th><th>Estado</th><th></th></tr>
+    </thead>
+    <tbody>
+      @for (c of cupones(); track c.id) {
+        <tr>
+          <td>{{ c.nombre }}</td>
+          <td>{{ aQuienAplica(c) }}</td>
+          <td>{{ c.porcentaje }}%</td>
+          <td>{{ c.activo ? 'Activo' : 'Inactivo' }}</td>
+          <td>
+            <div class="row">
+              <a [routerLink]="['/gestor/cupones', c.id]" class="btn btn-ghost">Editar</a>
+              @if (c.tipo !== 'bienvenida') {
+                <button class="btn btn-danger" (click)="eliminar(c)">Eliminar</button>
+              }
+            </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr><td colspan="5">No hay cupones cargados.</td></tr>
+      }
+    </tbody>
+  </table>
+}

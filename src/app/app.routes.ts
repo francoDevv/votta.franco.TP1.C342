@@ -37,5 +37,9 @@ export const routes: Routes = [
     path: 'funciones/:id/butacas',
     loadComponent: () => import('./pages/seleccion-butacas/seleccion-butacas').then(m => m.SeleccionButacas),
   },
+  {
+    path: 'funciones/:id/candy',
+    loadComponent: () => import('./pages/candy-seleccion/candy-seleccion').then(m => m.CandySeleccion),
+  },
   { path: '', redirectTo: 'cartelera', pathMatch: 'full' },
 ];

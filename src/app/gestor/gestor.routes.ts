@@ -25,4 +25,32 @@ export const GESTOR_ROUTES: Routes = [
         path: 'funciones/nueva',
         loadComponent: () => import('./funcion-form/funcion-form').then(m => m.FuncionForm),
     },
+    {
+        path: 'categorias',
+        loadComponent: () => import('./categorias-admin/categorias-admin').then(m => m.CategoriasAdmin),
+    },
+    {
+        path: 'productos',
+        loadComponent: () => import('./productos-admin/productos-admin').then(m => m.ProductosAdmin),
+    },
+    {
+        path: 'productos/:id',
+        loadComponent: () => import('./producto-form/producto-form').then(m => m.ProductoForm),
+    },
+    {
+        path: 'combos',
+        loadComponent: () => import('./combos-admin/combos-admin').then(m => m.CombosAdmin),
+    },
+    {
+        path: 'combos/:id',
+        loadComponent: () => import('./combo-form/combo-form').then(m => m.ComboForm),
+    },
+    {
+        path: 'cupones',
+        loadComponent: () => import('./cupones-admin/cupones-admin').then(m => m.CuponesAdmin),
+    },
+    {
+        path: 'cupones/:id',
+        loadComponent: () => import('./cupon-form/cupon-form').then(m => m.CuponForm),
+    },
 ];

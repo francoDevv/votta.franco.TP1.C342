@@ -1,0 +1,31 @@
+<div class="row" style="justify-content: space-between; margin-bottom: 20px;">
+  <h1 style="margin: 0;">Combos</h1>
+  <a routerLink="/gestor/combos/nuevo" class="btn btn-primary">+ Nuevo combo</a>
+</div>
+
+@if (cargando()) {
+  <p>Cargando…</p>
+} @else {
+  <table>
+    <thead><tr><th>Nombre</th><th>Incluye</th><th>Precio</th><th>Destacado</th><th>Disponible</th><th></th></tr></thead>
+    <tbody>
+      @for (c of combos(); track c.id) {
+        <tr>
+          <td>{{ c.nombre }}</td>
+          <td>{{ c.items.map(i => i.cantidad + 'x ' + i.productos.nombre).join(', ') }}</td>
+          <td>${{ c.precio }}</td>
+          <td>{{ c.destacado ? 'Sí' : 'No' }}</td>
+          <td>{{ c.disponible ? 'Sí' : 'No' }}</td>
+          <td>
+            <div class="row">
+              <a [routerLink]="['/gestor/combos', c.id]" class="btn btn-ghost">Editar</a>
+              <button class="btn btn-danger" (click)="eliminar(c)">Eliminar</button>
+            </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr><td colspan="6">No hay combos todavía.</td></tr>
+      }
+    </tbody>
+  </table>
+}

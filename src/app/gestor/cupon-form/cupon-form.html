@@ -1,0 +1,37 @@
+<a routerLink="/gestor/cupones" class="back-link">‹ Volver a cupones</a>
+
+<div class="card" style="max-width: 460px;">
+  <h1>{{ cuponId() ? 'Editar cupón' : 'Nuevo cupón' }}</h1>
+  @if (tipo() === 'bienvenida') {
+    <p class="ticket-meta">Se aplica automáticamente a la primera compra de cada cliente registrado.</p>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="guardar()">
+    <div class="field">
+      <label>Nombre</label>
+      <input formControlName="nombre" />
+    </div>
+    <div class="field">
+      <label>Descuento (%)</label>
+      <input type="number" formControlName="porcentaje" min="1" max="100" />
+    </div>
+    @if (tipo() === 'mayores') {
+      <div class="field">
+        <label>Aplica a clientes de más de (años)</label>
+        <input type="number" formControlName="edad_mayor_a" min="0" />
+      </div>
+    }
+    <div class="field">
+      <label>
+        <input type="checkbox" formControlName="activo" />
+        Cupón activo
+      </label>
+    </div>
+
+    @if (error()) {
+      <p class="form-error">{{ error() }}</p>
+    }
+
+    <button type="submit" class="btn btn-primary" [disabled]="form.invalid || guardando()">Guardar</button>
+  </form>
+</div>

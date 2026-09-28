@@ -1,0 +1,96 @@
+@if (cargando()) {
+  <p>Cargando…</p>
+} @else if (!funcion()) {
+  <a routerLink="/cartelera" class="back-link">‹ Volver a la cartelera</a>
+  <p>Función no encontrada.</p>
+} @else if (entradasSeleccionadas().length === 0) {
+  <a [routerLink]="['/funciones', funcion()!.id, 'butacas']" class="back-link">‹ Volver al mapa de butacas</a>
+  <p>No tenés butacas seleccionadas todavía. Elegilas para continuar.</p>
+} @else {
+  <a [routerLink]="['/funciones', funcion()!.id, 'butacas']" class="back-link">‹ Volver al mapa de butacas</a>
+
+  <h1>{{ funcion()!.peliculas.nombre }}</h1>
+  <p class="ticket-meta">{{ funcion()!.salas.nombre }} · {{ funcion()!.inicio | date: 'dd/MM/yyyy · HH:mm' }}</p>
+
+  <div class="card" style="max-width: 480px; margin: 20px 0;">
+    <h3 style="margin-top: 0;">Tus entradas</h3>
+    @for (b of entradasSeleccionadas(); track b.id) {
+      <div class="row" style="justify-content: space-between;">
+        <span>{{ b.fila }}{{ b.numero }} <span class="chip">{{ b.tipo }}</span></span>
+        <span>${{ preciosButaca[b.tipo] }}</span>
+      </div>
+    }
+  </div>
+
+  <h2>Sumá candy</h2>
+  <div class="grid-cards">
+    @for (p of productos(); track p.id) {
+      <div class="card producto-item">
+        <p class="ticket-title">{{ p.nombre }}</p>
+        <p class="ticket-meta">${{ p.precio }}</p>
+        <div class="row" style="justify-content: center; margin-top: 10px;">
+          <button type="button" class="btn btn-ghost" (click)="cambiarCantidadProducto(p.id, -1)">−</button>
+          <strong>{{ cantidadProducto(p.id) }}</strong>
+          <button type="button" class="btn btn-ghost" (click)="cambiarCantidadProducto(p.id, 1)">+</button>
+        </div>
+      </div>
+    } @empty {
+      <p>No hay productos disponibles por el momento.</p>
+    }
+  </div>
+
+  @if (combos().length > 0) {
+    <h2 style="margin-top: 28px;">Combos</h2>
+    <div class="grid-cards">
+      @for (c of combos(); track c.id) {
+       <div class="ticket-card">
+        <div class="ticket-body">
+            @if (c.destacado) {
+            <span class="ticket-badge ticket-badge-inline">Destacado</span>
+            }
+            <p class="ticket-title">{{ c.nombre }}</p>
+            <p class="ticket-meta">{{ c.items.map(i => i.cantidad + 'x ' + i.productos.nombre).join(' + ') }}</p>
+            <p style="margin-top: 8px;"><strong>${{ c.precio }}</strong></p>
+          </div>
+          <div class="ticket-perforation"></div>
+          <div class="ticket-footer" style="justify-content: center; gap: 14px;">
+            <button type="button" class="btn btn-ghost" (click)="cambiarCantidadCombo(c.id, -1)">−</button>
+            <strong>{{ cantidadCombo(c.id) }}</strong>
+            <button type="button" class="btn btn-ghost" (click)="cambiarCantidadCombo(c.id, 1)">+</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+    <div class="card resumen-compra">
+        @if (cupon(); as c) {
+            <div class="promo">
+            Cupón <strong>{{ c.nombre }}</strong> aplicado: {{ c.porcentaje }}% de descuento.
+            </div>
+        } @else if (!auth.logueado() && porcentajeBienvenida()) {
+            <div class="promo">
+            Registrate y obtené <strong>{{ porcentajeBienvenida() }}% de descuento</strong> en tu primera compra.
+            <a routerLink="/registro">Crear cuenta</a>
+            </div>
+        }
+
+        <div class="row" style="justify-content: space-between;">
+            <span>Entradas</span><span>${{ totalButacas() }}</span>
+        </div>
+        <div class="row" style="justify-content: space-between;">
+            <span>Candy</span><span>${{ totalCandy() }}</span>
+        </div>
+        @if (descuento() > 0) {
+            <div class="row" style="justify-content: space-between; color: var(--highlight);">
+            <span>Descuento ({{ cupon()!.porcentaje }}%)</span><span>−${{ descuento() }}</span>
+            </div>
+        }
+        <div class="row" style="justify-content: space-between; font-size: 18px; margin-top: 8px;">
+            <strong>Total</strong><strong>${{ totalFinal() }}</strong>
+        </div>
+        <button class="btn btn-primary" disabled title="Próximamente: pago" style="margin-top: 14px;">
+            Continuar con la compra
+        </button>
+    </div>
+}

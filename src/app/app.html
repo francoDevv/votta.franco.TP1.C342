@@ -1,10 +1,13 @@
 <nav class="navbar">
   <div class="row">
-    <a routerLink="/cartelera" class="brand">CINE <span>NOCTURNO</span></a>
+    <a routerLink="/cartelera" class="brand">CINE <span>FRAN</span></a>
     @if (!auth.cargando() && (auth.rol() === 'gestor' || auth.rol() === 'admin')) {
       <a routerLink="/gestor/peliculas" class="nav-link">Películas</a>
       <a routerLink="/gestor/salas" class="nav-link">Salas</a>
       <a routerLink="/gestor/funciones" class="nav-link">Funciones</a>
+      <a routerLink="/gestor/productos" class="nav-link">Candy</a>
+      <a routerLink="/gestor/combos" class="nav-link">Combos</a>
+      <a routerLink="/gestor/cupones" class="nav-link">Cupones</a>
     }
   </div>
 
