@@ -24,7 +24,6 @@ export class Login {
   private yaRedirigido = false;
 
   constructor() {
-    // Apenas se sabe que hay sesión (recién logueado, o ya la tenía al entrar a /login), redirige.
     effect(() => {
       if (!this.auth.cargando() && this.auth.logueado() && !this.yaRedirigido) {
         this.yaRedirigido = true;

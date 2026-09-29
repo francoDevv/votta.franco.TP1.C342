@@ -6,8 +6,6 @@ import { ButacasService, PRECIOS_BUTACA } from '../../services/butacas.service';
 import { SalasService, Butaca } from '../../services/salas.service';
 import { FuncionesService, Funcion } from '../../services/funciones.service';
 
-// Precios fijos temporales. Cuando armemos cupones/precios configurables
-// en el panel de admin, esto se reemplaza por datos reales de la base.
 interface FilaAgrupada { fila: string; columnas: Butaca[][]; }
 
 @Component({

@@ -6,6 +6,7 @@ import { SalasService, Butaca } from '../../services/salas.service';
 import { FuncionesService, Funcion } from '../../services/funciones.service';
 import { CandyService, Producto, Combo } from '../../services/candy.service';
 import { CuponesService, CuponAplicable } from '../../services/cupones.service';
+import { ComprasService, DetalleCompra } from '../../services/compras.service';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -21,6 +22,7 @@ export class CandySeleccion implements OnInit {
   private funcionesService = inject(FuncionesService);
   private candyService = inject(CandyService);
   private cuponesService = inject(CuponesService);
+  private comprasService = inject(ComprasService);
   protected auth = inject(AuthService);
 
   protected preciosButaca = PRECIOS_BUTACA;
@@ -33,6 +35,12 @@ export class CandySeleccion implements OnInit {
 
   cupon = signal<CuponAplicable | null>(null);
   porcentajeBienvenida = signal<number | null>(null);
+
+  mailContacto = signal('');
+  confirmando = signal(false);
+  errorConfirmar = signal('');
+  detalleCompra = signal<DetalleCompra | null>(null);
+  descargandoPdf = signal(false);
 
   private cantidadProductos = signal<Map<number, number>>(new Map());
   private cantidadCombos = signal<Map<number, number>>(new Map());
@@ -60,7 +68,6 @@ export class CandySeleccion implements OnInit {
 
   totalGeneral = computed(() => this.totalButacas() + this.totalCandy());
 
-  // Solo para mostrar. El importe real se vuelve a calcular en la base al confirmar la compra.
   descuento = computed(() => {
     const c = this.cupon();
     return c ? Math.round((this.totalGeneral() * c.porcentaje) / 100) : 0;
@@ -68,8 +75,13 @@ export class CandySeleccion implements OnInit {
 
   totalFinal = computed(() => this.totalGeneral() - this.descuento());
 
+  puedeConfirmar = computed(() => {
+    if (this.entradasSeleccionadas().length === 0) return false;
+    if (!this.auth.logueado() && !this.mailContacto().trim()) return false;
+    return true;
+  });
+
   constructor() {
-    // Espera a saber quién está logueado (importante al recargar la página) y consulta el cupón.
     effect(() => {
       if (this.auth.cargando()) return;
       const rol = this.auth.rol();
@@ -138,5 +150,41 @@ export class CandySeleccion implements OnInit {
       siguiente === 0 ? nuevo.delete(id) : nuevo.set(id, siguiente);
       return nuevo;
     });
+  }
+
+  async confirmarCompra() {
+    const funcion = this.funcion();
+    if (!funcion || !this.puedeConfirmar()) return;
+
+    this.confirmando.set(true);
+    this.errorConfirmar.set('');
+    try {
+      const detalle = await this.comprasService.confirmar({
+        funcionId: funcion.id,
+        sessionId: this.butacasService.sessionId,
+        productos: this.productosSeleccionados().map((p) => ({ productoId: p.producto.id, cantidad: p.cantidad })),
+        combos: this.combosSeleccionados().map((c) => ({ comboId: c.combo.id, cantidad: c.cantidad })),
+        mailContacto: this.mailContacto(),
+      });
+      this.detalleCompra.set(detalle);
+    } catch (e: any) {
+      console.error('Error al confirmar la compra', e);
+      this.errorConfirmar.set(e?.message ?? 'No se pudo confirmar la compra. Intentá de nuevo.');
+    } finally {
+      this.confirmando.set(false);
+    }
+  }
+
+  async descargarPdf() {
+    const detalle = this.detalleCompra();
+    if (!detalle) return;
+    this.descargandoPdf.set(true);
+    try {
+      await this.comprasService.generarPdf(detalle);
+    } catch (e) {
+      console.error('No se pudo generar el PDF', e);
+    } finally {
+      this.descargandoPdf.set(false);
+    }
   }
 }

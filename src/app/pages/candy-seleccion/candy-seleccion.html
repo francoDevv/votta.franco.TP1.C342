@@ -3,9 +3,22 @@
 } @else if (!funcion()) {
   <a routerLink="/cartelera" class="back-link">‹ Volver a la cartelera</a>
   <p>Función no encontrada.</p>
-} @else if (entradasSeleccionadas().length === 0) {
+} @else if (entradasSeleccionadas().length === 0 && !detalleCompra()) {
   <a [routerLink]="['/funciones', funcion()!.id, 'butacas']" class="back-link">‹ Volver al mapa de butacas</a>
   <p>No tenés butacas seleccionadas todavía. Elegilas para continuar.</p>
+} @else if (detalleCompra(); as d) {
+  <div class="card" style="max-width: 480px; margin: 40px auto; text-align: center;">
+    <h1>¡Compra confirmada!</h1>
+    <p class="ticket-meta">Te enviamos los datos a {{ d.mail_contacto }}</p>
+    <p style="margin: 16px 0;">{{ d.pelicula }} · {{ d.sala }} · {{ d.inicio | date: 'dd/MM/yyyy HH:mm' }}</p>
+    <p><strong>Total pagado: ${{ d.total }}</strong></p>
+    <button class="btn btn-primary" (click)="descargarPdf()" [disabled]="descargandoPdf()" style="margin-top: 16px;">
+      Descargar entrada (PDF)
+    </button>
+    <div style="margin-top: 20px;">
+      <a routerLink="/cartelera" class="btn btn-ghost">Volver a la cartelera</a>
+    </div>
+  </div>
 } @else {
   <a [routerLink]="['/funciones', funcion()!.id, 'butacas']" class="back-link">‹ Volver al mapa de butacas</a>
 
@@ -43,10 +56,10 @@
     <h2 style="margin-top: 28px;">Combos</h2>
     <div class="grid-cards">
       @for (c of combos(); track c.id) {
-       <div class="ticket-card">
-        <div class="ticket-body">
+        <div class="ticket-card">
+          <div class="ticket-body">
             @if (c.destacado) {
-            <span class="ticket-badge ticket-badge-inline">Destacado</span>
+              <span class="ticket-badge ticket-badge-inline">Destacado</span>
             }
             <p class="ticket-title">{{ c.nombre }}</p>
             <p class="ticket-meta">{{ c.items.map(i => i.cantidad + 'x ' + i.productos.nombre).join(' + ') }}</p>
@@ -63,34 +76,51 @@
     </div>
   }
 
-    <div class="card resumen-compra">
-        @if (cupon(); as c) {
-            <div class="promo">
-            Cupón <strong>{{ c.nombre }}</strong> aplicado: {{ c.porcentaje }}% de descuento.
-            </div>
-        } @else if (!auth.logueado() && porcentajeBienvenida()) {
-            <div class="promo">
-            Registrate y obtené <strong>{{ porcentajeBienvenida() }}% de descuento</strong> en tu primera compra.
-            <a routerLink="/registro">Crear cuenta</a>
-            </div>
-        }
+  <div class="card resumen-compra">
+    @if (cupon(); as c) {
+      <div class="promo">
+        Cupón <strong>{{ c.nombre }}</strong> aplicado: {{ c.porcentaje }}% de descuento.
+      </div>
+    } @else if (!auth.logueado() && porcentajeBienvenida()) {
+      <div class="promo">
+        Registrate y obtené <strong>{{ porcentajeBienvenida() }}% de descuento</strong> en tu primera compra.
+        <a routerLink="/registro">Crear cuenta</a>
+      </div>
+    }
 
-        <div class="row" style="justify-content: space-between;">
-            <span>Entradas</span><span>${{ totalButacas() }}</span>
-        </div>
-        <div class="row" style="justify-content: space-between;">
-            <span>Candy</span><span>${{ totalCandy() }}</span>
-        </div>
-        @if (descuento() > 0) {
-            <div class="row" style="justify-content: space-between; color: var(--highlight);">
-            <span>Descuento ({{ cupon()!.porcentaje }}%)</span><span>−${{ descuento() }}</span>
-            </div>
-        }
-        <div class="row" style="justify-content: space-between; font-size: 18px; margin-top: 8px;">
-            <strong>Total</strong><strong>${{ totalFinal() }}</strong>
-        </div>
-        <button class="btn btn-primary" disabled title="Próximamente: pago" style="margin-top: 14px;">
-            Continuar con la compra
-        </button>
+    <div class="row" style="justify-content: space-between;">
+      <span>Entradas</span><span>${{ totalButacas() }}</span>
     </div>
+    <div class="row" style="justify-content: space-between;">
+      <span>Candy</span><span>${{ totalCandy() }}</span>
+    </div>
+    @if (descuento() > 0) {
+      <div class="row" style="justify-content: space-between; color: var(--highlight);">
+        <span>Descuento ({{ cupon()!.porcentaje }}%)</span><span>−${{ descuento() }}</span>
+      </div>
+    }
+    <div class="row" style="justify-content: space-between; font-size: 18px; margin-top: 8px;">
+      <strong>Total</strong><strong>${{ totalFinal() }}</strong>
+    </div>
+
+    @if (!auth.logueado()) {
+      <div class="field" style="margin-top: 14px;">
+        <label>Mail de contacto (para recibir tu entrada)</label>
+        <input type="email" [value]="mailContacto()" (input)="mailContacto.set($any($event.target).value)" placeholder="tu@mail.com" />
+      </div>
+    }
+
+    @if (errorConfirmar()) {
+      <p class="form-error">{{ errorConfirmar() }}</p>
+    }
+
+    <button
+      class="btn btn-primary"
+      style="margin-top: 14px;"
+      [disabled]="!puedeConfirmar() || confirmando()"
+      (click)="confirmarCompra()"
+    >
+      {{ confirmando() ? 'Procesando pago…' : 'Pagar (simulado)' }}
+    </button>
+  </div>
 }

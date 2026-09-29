@@ -29,9 +29,9 @@ export class FuncionesService {
 
   async crearRecurrentes(datos: {
     peliculaId: number;
-    diasSemana: number[]; // 0=domingo ... 6=sábado
-    hora: string;         // 'HH:mm'
-    fechaDesde: string;   // 'YYYY-MM-DD'
+    diasSemana: number[]; 
+    hora: string;         
+    fechaDesde: string;   
     fechaHasta: string;
     formato: Formato;
     idioma: Idioma;

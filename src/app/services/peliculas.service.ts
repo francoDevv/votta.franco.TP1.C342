@@ -44,7 +44,7 @@ export class PeliculasService {
     return { ...p, generos: p.pelicula_genero.map((pg: any) => pg.generos) };
   }
 
-  // ---------- Cartelera ----------
+  // Cartelera
 
   async listarVisibles(): Promise<Pelicula[]> {
     const { data, error } = await this.supabase
@@ -75,7 +75,7 @@ export class PeliculasService {
     return data.publicUrl;
   }
 
-  // ---------- ABM (gestor/admin) ----------
+  // CRUD gestor/admin
 
   async listarTodas(): Promise<Pelicula[]> {
     const { data, error } = await this.supabase
@@ -143,7 +143,7 @@ export class PeliculasService {
     if (error) throw error;
   }
 
-  // ---------- Reseñas ----------
+  // Reseñas
 
   async listarResenas(peliculaId: number): Promise<Resena[]> {
     const { data, error } = await this.supabase

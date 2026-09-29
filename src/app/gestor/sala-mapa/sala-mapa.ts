@@ -6,7 +6,7 @@ import { RouterLink } from '@angular/router';
 interface FilaAgrupada {
   fila: string;
   tipo: string;
-  columnas: Butaca[][]; // 3 columnas, cada una con sus butacas en orden
+  columnas: Butaca[][];
 }
 
 @Component({

@@ -16,7 +16,6 @@ export class CuponForm implements OnInit {
   private router = inject(Router);
 
   cuponId = signal<number | null>(null);
-  // Los cupones nuevos son siempre "para mayores"; el de bienvenida ya existe y solo se edita.
   tipo = signal<TipoCupon>('mayores');
   guardando = signal(false);
   error = signal('');

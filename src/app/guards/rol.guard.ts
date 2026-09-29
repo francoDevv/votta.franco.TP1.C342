@@ -16,7 +16,7 @@ export function rolGuard(rolesPermitidos: Rol[]): CanMatchFn {
         if (!auth.logueado()) return router.parseUrl('/login');
         return rolesPermitidos.includes(auth.rol())
           ? true
-          : router.parseUrl('/'); // logueado, pero sin permiso: no muestra el admin
+          : router.parseUrl('/');
       })
     );
   };

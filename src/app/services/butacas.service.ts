@@ -35,8 +35,6 @@ export class ButacasService {
   }
 
   constructor() {
-    // Si cambia quién está logueado (login, logout, o cambio de cuenta) en la misma pestaña,
-    // el carrito de reservas no debe heredarse: liberamos lo viejo y arrancamos sesión nueva.
     effect(() => {
       if (this.auth.cargando()) return;
       const identidadActual = this.auth.usuario()?.id ?? 'anonimo';
