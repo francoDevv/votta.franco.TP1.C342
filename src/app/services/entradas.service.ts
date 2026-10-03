@@ -8,6 +8,7 @@ export interface MiEntrada {
   precio: number;
   estado: 'activa' | 'validada' | 'cancelada';
   fila: string;
+  orden_fila: number;
   numero: number;
 }
 
@@ -17,6 +18,8 @@ export interface MiCompra {
   pelicula: string;
   sala: string;
   inicio: string;
+  fin: string;
+  total: number;
   entradas: MiEntrada[];
   totalCandy: number;
 }
@@ -30,9 +33,9 @@ export class EntradasService {
       .from('entradas')
       .select(`
         id, compra_id, funcion_id, precio, estado,
-        butacas ( fila, numero ),
-        funciones ( inicio, peliculas ( nombre ), salas ( nombre ) ),
-        compras!inner ( cliente_id, estado )
+        butacas ( fila, numero, orden_fila ),
+        funciones ( inicio, fin, peliculas ( nombre ), salas ( nombre ) ),
+        compras!inner ( cliente_id, estado, total )
       `)
       .eq('compras.cliente_id', clienteId)
       .order('compra_id', { ascending: false });
@@ -47,6 +50,8 @@ export class EntradasService {
           pelicula: e.funciones.peliculas.nombre,
           sala: e.funciones.salas.nombre,
           inicio: e.funciones.inicio,
+          fin: e.funciones.fin,
+          total: Number(e.compras.total),
           entradas: [],
           totalCandy: 0,
         });
@@ -55,9 +60,10 @@ export class EntradasService {
         id: e.id,
         compra_id: e.compra_id,
         funcion_id: e.funcion_id,
-        precio: e.precio,
+        precio: Number(e.precio),
         estado: e.estado,
         fila: e.butacas.fila,
+        orden_fila: e.butacas.orden_fila,
         numero: e.butacas.numero,
       });
     }
@@ -69,14 +75,23 @@ export class EntradasService {
           .from('compra_productos')
           .select('precio_unitario, cantidad')
           .eq('compra_id', c.compra_id);
-        c.totalCandy = (candy ?? []).reduce((s, p) => s + p.precio_unitario * p.cantidad, 0);
+        c.totalCandy = (candy ?? []).reduce(
+          (s, p) => s + Number(p.precio_unitario) * p.cantidad,
+          0
+        );
       })
     );
+
+    for (const c of compras) {
+      c.entradas.sort((a, b) => a.orden_fila - b.orden_fila || a.numero - b.numero);
+    }
 
     return compras;
   }
 
-  async cancelarCompra(compraId: number): Promise<{ credito_acreditado: number; butacas_canceladas: number }> {
+  async cancelarCompra(
+    compraId: number
+  ): Promise<{ credito_acreditado: number; butacas_canceladas: number }> {
     const { data, error } = await this.supabase.rpc('cancelar_compra', { p_compra_id: compraId });
     if (error) throw error;
     return data;
@@ -89,6 +104,6 @@ export class EntradasService {
       .eq('cliente_id', clienteId)
       .maybeSingle();
     if (error) throw error;
-    return data?.saldo ?? 0;
+    return Number(data?.saldo ?? 0);
   }
 }

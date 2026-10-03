@@ -1,11 +1,16 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { DatePipe, DecimalPipe, registerLocaleData } from '@angular/common';
+import localeEsAr from '@angular/common/locales/es-AR';
 import { EntradasService, MiCompra } from '../../services/entradas.service';
 import { AuthService } from '../../services/auth.service';
 
+registerLocaleData(localeEsAr);
+
+const LIMITE_CANCELACION_MS = 2 * 60 * 60 * 1000;
+
 @Component({
   selector: 'app-mis-entradas',
-  imports: [DatePipe],
+  imports: [DatePipe, DecimalPipe],
   templateUrl: './mis-entradas.html',
   styleUrl: './mis-entradas.css',
 })
@@ -35,20 +40,57 @@ export class MisEntradas implements OnInit {
     this.cargando.set(false);
   }
 
+  subtotalEntradas(c: MiCompra): number {
+    return c.entradas.reduce((s, e) => s + e.precio, 0);
+  }
+
+  /** Total realmente pagado (guardado en compras.total). */
   totalCompra(c: MiCompra): number {
-    return c.entradas.reduce((s, e) => s + e.precio, 0) + c.totalCandy;
+    return c.total;
+  }
+
+  /** Diferencia entre lo que valía la compra y lo que se pagó (cupón y/o crédito usado). */
+  ajuste(c: MiCompra): number {
+    return this.subtotalEntradas(c) + c.totalCandy - c.total;
+  }
+
+  /** Devuelve el precio si todas las butacas cuestan lo mismo, si no null. */
+  precioUnitario(c: MiCompra): number | null {
+    const precios = new Set(c.entradas.map((e) => e.precio));
+    return precios.size === 1 ? c.entradas[0].precio : null;
+  }
+
+  /** Motivo por el que una compra confirmada no se puede cancelar (null = se puede). */
+  motivoNoCancelable(c: MiCompra): string | null {
+    if (c.estado !== 'confirmada') return null;
+
+    const ahora = Date.now();
+    const inicio = new Date(c.inicio).getTime();
+    const fin = new Date(c.fin).getTime();
+
+    if (ahora >= fin) return 'Función finalizada.';
+    if (ahora >= inicio) return 'La función ya comenzó.';
+
+    if (c.entradas.some((e) => e.estado === 'validada')) {
+      return 'No se puede cancelar: ya se validaron entradas de esta compra.';
+    }
+    if (c.entradas.some((e) => e.estado !== 'activa')) {
+      return 'No se puede cancelar: la compra tiene entradas que no están activas.';
+    }
+    if (inicio - ahora < LIMITE_CANCELACION_MS) {
+      return 'Ya no se puede cancelar: faltan menos de 2 horas para la función.';
+    }
+    return null;
   }
 
   puedeCancelar(c: MiCompra): boolean {
-    if (c.estado !== 'confirmada') return false;
-    if (c.entradas.some((e) => e.estado !== 'activa')) return false;
-    const dosHorasAntes = new Date(c.inicio).getTime() - 2 * 60 * 60 * 1000;
-    return Date.now() < dosHorasAntes;
+    return c.estado === 'confirmada' && this.motivoNoCancelable(c) === null;
   }
 
   async cancelar(c: MiCompra) {
+    const monto = this.totalCompra(c).toLocaleString('es-AR');
     const confirmado = confirm(
-      `¿Cancelar toda la compra (${c.entradas.length} butaca(s) + candy)? Se te acreditará $${this.totalCompra(c)} como crédito.`
+      `¿Cancelar toda la compra (${c.entradas.length} butaca(s) + candy)? Se te acreditarán $${monto} como crédito.`
     );
     if (!confirmado) return;
 
