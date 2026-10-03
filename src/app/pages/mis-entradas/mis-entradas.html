@@ -69,6 +69,16 @@
 
         <p class="chip">Compra {{ c.estado }}</p>
 
+        @if (c.estado === 'confirmada') {
+          <button
+            class="btn btn-ghost"
+            [disabled]="descargando() === c.compra_id"
+            (click)="descargarPdf(c)"
+          >
+            {{ descargando() === c.compra_id ? 'Generando PDF…' : 'Descargar entrada' }}
+          </button>
+        }
+
         @if (puedeCancelar(c)) {
           <button
             class="btn btn-danger"

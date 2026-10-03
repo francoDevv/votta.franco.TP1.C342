@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { DatePipe, DecimalPipe, registerLocaleData } from '@angular/common';
 import localeEsAr from '@angular/common/locales/es-AR';
 import { EntradasService, MiCompra } from '../../services/entradas.service';
+import { ComprasService } from '../../services/compras.service';
 import { AuthService } from '../../services/auth.service';
 
 registerLocaleData(localeEsAr);
@@ -16,12 +17,14 @@ const LIMITE_CANCELACION_MS = 2 * 60 * 60 * 1000;
 })
 export class MisEntradas implements OnInit {
   private entradasService = inject(EntradasService);
+  private comprasService = inject(ComprasService);
   private auth = inject(AuthService);
 
   compras = signal<MiCompra[]>([]);
   credito = signal(0);
   cargando = signal(true);
   cancelando = signal<number | null>(null);
+  descargando = signal<number | null>(null);
   error = signal('');
 
   async ngOnInit() {
@@ -85,6 +88,20 @@ export class MisEntradas implements OnInit {
 
   puedeCancelar(c: MiCompra): boolean {
     return c.estado === 'confirmada' && this.motivoNoCancelable(c) === null;
+  }
+
+  async descargarPdf(c: MiCompra) {
+    this.descargando.set(c.compra_id);
+    this.error.set('');
+    try {
+      const detalle = await this.comprasService.obtenerDetalle(c.compra_id);
+      await this.comprasService.generarPdf(detalle);
+    } catch (err: any) {
+      console.error(err);
+      this.error.set(err?.message ?? 'No se pudo generar el PDF.');
+    } finally {
+      this.descargando.set(null);
+    }
   }
 
   async cancelar(c: MiCompra) {

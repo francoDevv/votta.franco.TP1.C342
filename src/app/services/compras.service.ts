@@ -34,7 +34,7 @@ export class ComprasService {
     productos: { productoId: number; cantidad: number }[];
     combos: { comboId: number; cantidad: number }[];
     mailContacto: string;
-    creditoAUsar?: number; // nuevo, opcional
+    creditoAUsar?: number;
   }): Promise<DetalleCompra> {
     const { data, error } = await this.supabase.rpc('confirmar_compra', {
       p_funcion_id: datos.funcionId,
@@ -44,8 +44,15 @@ export class ComprasService {
       p_combo_ids: datos.combos.map((c) => c.comboId),
       p_combo_cantidades: datos.combos.map((c) => c.cantidad),
       p_mail_contacto: datos.mailContacto || null,
-      p_credito_a_usar: datos.creditoAUsar ?? 0, // nuevo
+      p_credito_a_usar: datos.creditoAUsar ?? 0,
     });
+    if (error) throw error;
+    return data as DetalleCompra;
+  }
+
+  /** Datos de una compra ya hecha, con el mismo formato que devuelve confirmar(). */
+  async obtenerDetalle(compraId: number): Promise<DetalleCompra> {
+    const { data, error } = await this.supabase.rpc('detalle_compra', { p_compra_id: compraId });
     if (error) throw error;
     return data as DetalleCompra;
   }
@@ -90,6 +97,9 @@ export class ComprasService {
     y += 4;
     if (detalle.cupon_nombre) {
       doc.text(`Cupón aplicado: ${detalle.cupon_nombre} (−$${detalle.descuento})`, 20, y);
+      y += 8;
+    } else if (detalle.descuento > 0) {
+      doc.text(`Descuento / crédito aplicado: −$${detalle.descuento}`, 20, y);
       y += 8;
     }
     doc.setFontSize(14);
