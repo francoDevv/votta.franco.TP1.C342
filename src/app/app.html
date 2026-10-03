@@ -9,6 +9,9 @@
       <a routerLink="/gestor/combos" class="nav-link">Combos</a>
       <a routerLink="/gestor/cupones" class="nav-link">Cupones</a>
     }
+    @if (!auth.cargando() && (auth.rol() === 'empleado' || auth.rol() === 'admin')) {
+      <a routerLink="/empleado" class="nav-link">Validar QR</a>
+    }
   </div>
 
   @if (!auth.cargando()) {
@@ -16,7 +19,9 @@
       <div class="row">
         <span class="chip">Rol: <b>{{ auth.rol() }}</b></span>
         <a routerLink="/perfil" class="btn btn-ghost">Mi perfil</a>
-        <a routerLink="/mis-entradas" class="btn btn-ghost">Mis entradas</a>
+        @if (auth.rol() === 'cliente') {
+          <a routerLink="/mis-entradas" class="btn btn-ghost">Mis entradas</a>
+        }
       </div>
     } @else {
       <a routerLink="/login" class="btn btn-primary">Ingresar</a>

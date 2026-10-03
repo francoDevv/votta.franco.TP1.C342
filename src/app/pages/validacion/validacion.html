@@ -1,0 +1,125 @@
+<section class="validacion">
+  <header class="validacion__header">
+    <h1>Validar QR</h1>
+    @if (!compra()) {
+      <div class="modos">
+        <button
+          type="button"
+          class="btn"
+          [class.btn-primary]="modo() === 'camara'"
+          [class.btn-ghost]="modo() !== 'camara'"
+          (click)="cambiarModo('camara')"
+        >
+          Cámara
+        </button>
+        <button
+          type="button"
+          class="btn"
+          [class.btn-primary]="modo() === 'manual'"
+          [class.btn-ghost]="modo() !== 'manual'"
+          (click)="cambiarModo('manual')"
+        >
+          Código manual
+        </button>
+      </div>
+    }
+  </header>
+
+  @if (error()) {
+    <p class="form-error">{{ error() }}</p>
+  }
+  @if (exito()) {
+    <p class="aviso-exito">{{ exito() }}</p>
+  }
+
+  @if (!compra()) {
+    @if (modo() === 'camara') {
+      <div id="lector-qr" class="lector"></div>
+      <p class="ayuda">Apuntá la cámara al QR de la entrada.</p>
+    } @else {
+      <form class="manual" (submit)="buscarManual($event)">
+        <input
+          class="input codigo"
+          type="text"
+          placeholder="Ej: 1718abe8"
+          autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
+          [value]="codigoManual()"
+          (input)="codigoManual.set($any($event.target).value)"
+        />
+        <button
+          class="btn btn-primary"
+          type="submit"
+          [disabled]="buscando() || codigoManual().trim().length < 8"
+        >
+          {{ buscando() ? 'Buscando…' : 'Buscar' }}
+        </button>
+      </form>
+      <p class="ayuda">Ingresá el código completo o solo los primeros 8 caracteres.</p>
+    }
+  } @else {
+    <div class="card resultado">
+      <div>
+        <p class="ticket-title">{{ compra()!.pelicula }}</p>
+        <p class="ticket-meta">
+          {{ compra()!.sala }} · {{ compra()!.inicio | date: 'dd/MM HH:mm' }} ·
+          {{ compra()!.formato }} · {{ compra()!.idioma }}
+        </p>
+      </div>
+
+      @if (compra()!.restriccion_edad > 0) {
+        <p class="alerta-edad">
+          Película +{{ compra()!.restriccion_edad }}: menores deben ingresar acompañados de un adulto.
+        </p>
+      }
+
+      @if (bloqueo() && !exito()) {
+        <p class="form-error">{{ bloqueo() }}</p>
+      }
+
+      <div class="bloques">
+        <div class="bloque">
+          <h2>Entradas</h2>
+          <ul class="butacas">
+            @for (e of compra()!.entradas; track e.fila + e.numero) {
+              <li
+                class="chip butaca"
+                [class.butaca--validada]="e.estado === 'validada'"
+                [class.butaca--cancelada]="e.estado === 'cancelada'"
+              >
+                {{ e.fila }}{{ e.numero }}
+                @if (e.estado !== 'activa') {
+                  <span class="butaca__estado">· {{ e.estado }}</span>
+                }
+              </li>
+            }
+          </ul>
+        </div>
+
+        <div class="bloque">
+          <h2>Candy</h2>
+          @if (tieneCandy()) {
+            <ul class="productos">
+              @for (p of compra()!.productos; track $index) {
+                <li>{{ p.cantidad }}× {{ p.nombre }}</li>
+              }
+            </ul>
+          } @else {
+            <p class="ayuda ayuda--izq">Esta compra no incluye candy.</p>
+          }
+        </div>
+      </div>
+
+      <button
+        class="btn btn-primary validar"
+        [disabled]="bloqueo() !== null || validando()"
+        (click)="validar()"
+      >
+        {{ textoBoton() }}
+      </button>
+    </div>
+
+    <button class="btn btn-ghost siguiente" (click)="siguiente()">Escanear otro código</button>
+  }
+</section>

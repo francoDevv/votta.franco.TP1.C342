@@ -46,5 +46,10 @@ export const routes: Routes = [
     canMatch: [authGuard],
     loadComponent: () => import('./pages/mis-entradas/mis-entradas').then(m => m.MisEntradas),
   },
+  {
+    path: 'empleado',
+    canMatch: [rolGuard(['empleado', 'admin'])],
+    loadComponent: () => import('./pages/validacion/validacion').then(m => m.Validacion),
+  },
   { path: '', redirectTo: 'cartelera', pathMatch: 'full' },
 ];
