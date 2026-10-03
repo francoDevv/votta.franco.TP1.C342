@@ -41,5 +41,10 @@ export const routes: Routes = [
     path: 'funciones/:id/candy',
     loadComponent: () => import('./pages/candy-seleccion/candy-seleccion').then(m => m.CandySeleccion),
   },
+  {
+    path: 'mis-entradas',
+    canMatch: [authGuard],
+    loadComponent: () => import('./pages/mis-entradas/mis-entradas').then(m => m.MisEntradas),
+  },
   { path: '', redirectTo: 'cartelera', pathMatch: 'full' },
 ];

@@ -165,6 +165,7 @@ export class CandySeleccion implements OnInit {
         productos: this.productosSeleccionados().map((p) => ({ productoId: p.producto.id, cantidad: p.cantidad })),
         combos: this.combosSeleccionados().map((c) => ({ comboId: c.combo.id, cantidad: c.cantidad })),
         mailContacto: this.mailContacto(),
+        creditoAUsar: 0,
       });
       this.detalleCompra.set(detalle);
     } catch (e: any) {

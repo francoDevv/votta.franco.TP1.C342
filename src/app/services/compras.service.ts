@@ -34,6 +34,7 @@ export class ComprasService {
     productos: { productoId: number; cantidad: number }[];
     combos: { comboId: number; cantidad: number }[];
     mailContacto: string;
+    creditoAUsar?: number; // nuevo, opcional
   }): Promise<DetalleCompra> {
     const { data, error } = await this.supabase.rpc('confirmar_compra', {
       p_funcion_id: datos.funcionId,
@@ -43,6 +44,7 @@ export class ComprasService {
       p_combo_ids: datos.combos.map((c) => c.comboId),
       p_combo_cantidades: datos.combos.map((c) => c.cantidad),
       p_mail_contacto: datos.mailContacto || null,
+      p_credito_a_usar: datos.creditoAUsar ?? 0, // nuevo
     });
     if (error) throw error;
     return data as DetalleCompra;

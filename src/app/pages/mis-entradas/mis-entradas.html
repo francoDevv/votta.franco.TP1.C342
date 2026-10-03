@@ -1,0 +1,42 @@
+<h1>Mis entradas</h1>
+
+<div class="promo" style="max-width: 320px;">
+  Crédito disponible: <strong>${{ credito() }}</strong>
+</div>
+
+@if (error()) {
+  <p class="form-error">{{ error() }}</p>
+}
+
+@if (cargando()) {
+  <p>Cargando…</p>
+} @else {
+  <div class="grid-cards">
+    @for (c of compras(); track c.compra_id) {
+      <div class="card">
+        <p class="ticket-title">{{ c.pelicula }}</p>
+        <p class="ticket-meta">{{ c.sala }} · {{ c.inicio | date: 'dd/MM/yyyy HH:mm' }}</p>
+
+        <ul style="margin: 8px 0; padding-left: 18px;">
+          @for (e of c.entradas; track e.id) {
+            <li>{{ e.fila }}{{ e.numero }} · ${{ e.precio }} · <span class="chip">{{ e.estado }}</span></li>
+          }
+        </ul>
+
+        @if (c.totalCandy > 0) {
+          <p class="ticket-meta">Candy: ${{ c.totalCandy }}</p>
+        }
+        <p><strong>Total compra: ${{ totalCompra(c) }}</strong></p>
+        <p class="chip">Compra {{ c.estado }}</p>
+
+        @if (puedeCancelar(c)) {
+          <button class="btn btn-danger" [disabled]="cancelando() === c.compra_id" (click)="cancelar(c)">
+            {{ cancelando() === c.compra_id ? 'Cancelando…' : 'Cancelar compra completa' }}
+          </button>
+        }
+      </div>
+    } @empty {
+      <p>Todavía no tenés compras.</p>
+    }
+  </div>
+}
