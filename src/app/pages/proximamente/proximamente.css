@@ -1,0 +1,25 @@
+.estreno__acciones {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.estreno__acciones .btn {
+  text-align: center;
+}
+
+.estreno__apertura {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.estreno__apertura::first-letter {
+  text-transform: uppercase;
+}
+
+.estreno__preventa {
+  align-self: flex-start;
+  color: var(--highlight);
+  border-color: var(--highlight);
+}

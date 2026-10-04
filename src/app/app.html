@@ -1,6 +1,8 @@
 <nav class="navbar">
   <div class="row">
     <a routerLink="/cartelera" class="brand">CINE <span>FRAN</span></a>
+    <a routerLink="/cartelera" class="nav-link">Cartelera</a>
+    <a routerLink="/proximamente" class="nav-link">Próximamente</a>
     @if (!auth.cargando() && (auth.rol() === 'gestor' || auth.rol() === 'admin')) {
       <a routerLink="/gestor/peliculas" class="nav-link">Películas</a>
       <a routerLink="/gestor/salas" class="nav-link">Salas</a>
@@ -33,5 +35,6 @@
 </nav>
 
 <main class="container">
+  <app-avisos-estreno />
   <router-outlet />
 </main>

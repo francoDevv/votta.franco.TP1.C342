@@ -1,0 +1,57 @@
+<h1>Próximamente</h1>
+<p class="ticket-meta" style="margin-bottom: 20px;">
+  Estrenos de las próximas semanas. Activá una alerta y te avisamos cuando salgan las entradas a la venta.
+</p>
+
+@if (error()) {
+  <p class="form-error">{{ error() }}</p>
+}
+
+@if (cargando()) {
+  <p>Cargando estrenos…</p>
+} @else if (peliculas().length === 0) {
+  <p>No hay estrenos anunciados por el momento.</p>
+} @else {
+  <div class="grid-cards">
+    @for (p of peliculas(); track p.id) {
+      <article class="ticket-card estreno">
+        <a [routerLink]="['/peliculas', p.id]" style="color: inherit;">
+          <div class="ticket-poster">
+            @if (urlImagen(p.imagen_url); as url) {
+              <img [src]="url" [alt]="p.nombre" />
+            } @else {
+              <span>Sin imagen</span>
+            }
+          </div>
+          <div class="ticket-body">
+            <p class="ticket-title">{{ p.nombre }}</p>
+            <p class="ticket-meta">Estreno: {{ fechaEstreno(p) }}</p>
+          </div>
+        </a>
+        <div class="ticket-perforation"></div>
+        <div class="ticket-footer estreno__acciones">
+          @if (ventaAbierta(p)) {
+            <span class="chip estreno__preventa">En preventa</span>
+            <a [routerLink]="['/peliculas', p.id, 'funciones']" class="btn btn-primary">Comprar</a>
+          } @else {
+            <span class="estreno__apertura">Venta desde el {{ aperturaVenta(p) }}</span>
+            @if (auth.rol() === 'cliente') {
+              <button
+                type="button"
+                class="btn"
+                [class.btn-primary]="!alertas().has(p.id)"
+                [class.btn-ghost]="alertas().has(p.id)"
+                [disabled]="procesando() === p.id"
+                (click)="alternarAlerta(p)"
+              >
+                {{ alertas().has(p.id) ? 'Alerta activada ✓' : 'Avisarme' }}
+              </button>
+            } @else if (!auth.logueado()) {
+              <a routerLink="/login" class="btn btn-ghost">Ingresá para recibir un aviso</a>
+            }
+          }
+        </div>
+      </article>
+    }
+  </div>
+}

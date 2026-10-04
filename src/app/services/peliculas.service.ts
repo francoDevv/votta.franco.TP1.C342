@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { SupabaseService } from './supabase.service';
+import { DIAS_PREVENTA, aIso, hoy, sumarDias } from '../shared/fechas';
 
 export interface Genero {
   id: number;
@@ -61,12 +62,30 @@ export class PeliculasService {
 
   // Cartelera
 
+  /**
+   * Películas visibles con la venta abierta: sin fecha de estreno o con estreno
+   * dentro de los próximos 7 días (la venta abre 7 días antes).
+   */
   async listarVisibles(): Promise<Pelicula[]> {
+    const limiteEstreno = aIso(sumarDias(hoy(), DIAS_PREVENTA));
     const { data, error } = await this.supabase
       .from('peliculas')
       .select(SELECT_PELICULA)
       .eq('visible_en_home', true)
+      .or(`fecha_estreno.is.null,fecha_estreno.lte.${limiteEstreno}`)
       .order('nombre');
+    if (error) throw error;
+    return (data ?? []).map((p) => this.mapear(p));
+  }
+
+  /** Películas visibles que todavía no se estrenaron, de la más próxima a la más lejana. */
+  async listarProximamente(): Promise<Pelicula[]> {
+    const { data, error } = await this.supabase
+      .from('peliculas')
+      .select(SELECT_PELICULA)
+      .eq('visible_en_home', true)
+      .gt('fecha_estreno', aIso(hoy()))
+      .order('fecha_estreno');
     if (error) throw error;
     return (data ?? []).map((p) => this.mapear(p));
   }

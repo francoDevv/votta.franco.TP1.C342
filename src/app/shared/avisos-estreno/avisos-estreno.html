@@ -1,0 +1,16 @@
+@for (a of alertas.avisos(); track a.pelicula_id) {
+  <div class="aviso-estreno" role="status">
+    <span>
+      ¡Ya salieron a la venta las entradas de <strong>{{ a.nombre }}</strong>!
+      @if (a.en_preventa) {
+        <span class="aviso-estreno__preventa">Precio de preventa hasta el estreno.</span>
+      }
+    </span>
+    <div class="aviso-estreno__acciones">
+      <a [routerLink]="['/peliculas', a.pelicula_id, 'funciones']" class="btn btn-primary" (click)="cerrar(a)">
+        Comprar
+      </a>
+      <button type="button" class="aviso-estreno__cerrar" aria-label="Cerrar aviso" (click)="cerrar(a)">×</button>
+    </div>
+  </div>
+}

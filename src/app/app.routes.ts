@@ -21,6 +21,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/cartelera/cartelera').then(m => m.Cartelera),
   },
   {
+    path: 'proximamente',
+    loadComponent: () => import('./pages/proximamente/proximamente').then(m => m.Proximamente),
+  },
+  {
     path: 'gestor',
     canMatch: [rolGuard(['gestor', 'admin'])],
     loadChildren: () => import('./gestor/gestor.routes').then(m => m.GESTOR_ROUTES),
