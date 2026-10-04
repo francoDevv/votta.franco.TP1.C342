@@ -75,7 +75,7 @@
         @if (puedeDescargar(c)) {
           <button
             class="btn btn-ghost"
-            [disabled]="descargando() === c.compra_id"
+            [disabled]="descargando() === c.compra_id || !pwa.online()"
             (click)="descargarPdf(c)"
           >
             {{ descargando() === c.compra_id ? 'Generando PDF…' : 'Descargar entrada' }}
@@ -85,7 +85,7 @@
         @if (puedeCancelar(c)) {
           <button
             class="btn btn-danger"
-            [disabled]="cancelando() === c.compra_id"
+            [disabled]="cancelando() === c.compra_id || !pwa.online()"
             (click)="cancelar(c)"
           >
             {{ cancelando() === c.compra_id ? 'Cancelando…' : 'Cancelar compra' }}

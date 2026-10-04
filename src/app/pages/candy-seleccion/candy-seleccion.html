@@ -205,6 +205,9 @@
       </div>
     }
 
+    @if (!pwa.online()) {
+      <p class="form-error">Sin conexión: necesitás internet para pagar.</p>
+    }
     @if (errorConfirmar()) {
       <p class="form-error">{{ errorConfirmar() }}</p>
     }

@@ -3,38 +3,69 @@
     <a routerLink="/cartelera" class="brand">CINE <span>FRAN</span></a>
     <a routerLink="/cartelera" class="nav-link">Cartelera</a>
     <a routerLink="/proximamente" class="nav-link">Próximamente</a>
-    @if (!auth.cargando() && (auth.rol() === 'gestor' || auth.rol() === 'admin')) {
-      <a routerLink="/gestor/peliculas" class="nav-link">Películas</a>
-      <a routerLink="/gestor/salas" class="nav-link">Salas</a>
-      <a routerLink="/gestor/funciones" class="nav-link">Funciones</a>
-      <a routerLink="/gestor/productos" class="nav-link">Candy</a>
-      <a routerLink="/gestor/combos" class="nav-link">Combos</a>
-      <a routerLink="/gestor/cupones" class="nav-link">Cupones</a>
-      @if (auth.rol() === 'admin') {
-        <a routerLink="/gestor/precios" class="nav-link">Precios</a>
-        <a routerLink="/gestor/recompensas" class="nav-link">Recompensas</a>
-        <a routerLink="/gestor/reportes" class="nav-link">Reportes</a>
-        <a routerLink="/gestor/actividad" class="nav-link">Actividad</a>
+
+    @if (esGestion()) {
+      <details class="menu">
+        <summary class="nav-link">Cine</summary>
+        <div class="menu__panel">
+          <a routerLink="/gestor/peliculas" routerLinkActive="activo" class="menu__item">Películas</a>
+          <a routerLink="/gestor/salas" routerLinkActive="activo" class="menu__item">Salas</a>
+          <a routerLink="/gestor/funciones" routerLinkActive="activo" class="menu__item">Funciones</a>
+        </div>
+      </details>
+
+      <details class="menu">
+        <summary class="nav-link">Candy</summary>
+        <div class="menu__panel">
+          <a routerLink="/gestor/productos" routerLinkActive="activo" class="menu__item">Productos</a>
+          <a routerLink="/gestor/combos" routerLinkActive="activo" class="menu__item">Combos</a>
+        </div>
+      </details>
+
+      @if (esAdmin()) {
+        <details class="menu">
+          <summary class="nav-link">Precios y promos</summary>
+          <div class="menu__panel">
+            <a routerLink="/gestor/precios" routerLinkActive="activo" class="menu__item">Precios de entradas</a>
+            <a routerLink="/gestor/cupones" routerLinkActive="activo" class="menu__item">Cupones</a>
+            <a routerLink="/gestor/recompensas" routerLinkActive="activo" class="menu__item">Recompensas</a>
+          </div>
+        </details>
+
+        <details class="menu">
+          <summary class="nav-link">Informes</summary>
+          <div class="menu__panel">
+            <a routerLink="/gestor/reportes" routerLinkActive="activo" class="menu__item">Reportes</a>
+            <a routerLink="/gestor/actividad" routerLinkActive="activo" class="menu__item">Actividad</a>
+          </div>
+        </details>
+      } @else {
+        <a routerLink="/gestor/cupones" class="nav-link">Cupones</a>
       }
     }
-    @if (!auth.cargando() && (auth.rol() === 'empleado' || auth.rol() === 'admin')) {
+
+    @if (esValidador()) {
       <a routerLink="/empleado" class="nav-link">Validar QR</a>
     }
   </div>
 
   @if (!auth.cargando()) {
-    @if (auth.logueado()) {
-      <div class="row">
+    <div class="row">
+      @if (pwa.puedeInstalar() && !pwa.instalada()) {
+        <button type="button" class="btn btn-ghost" (click)="pwa.instalar()">Instalar app</button>
+      }
+
+      @if (auth.logueado()) {
         <span class="chip">Rol: <b>{{ auth.rol() }}</b></span>
         <a routerLink="/perfil" class="btn btn-ghost">Mi perfil</a>
         @if (auth.rol() === 'cliente') {
           <a routerLink="/mis-entradas" class="btn btn-ghost">Mis entradas</a>
           <a routerLink="/mis-peliculas" class="btn btn-ghost">Mis películas</a>
         }
-      </div>
-    } @else {
-      <a routerLink="/login" class="btn btn-primary">Ingresar</a>
-    }
+      } @else {
+        <a routerLink="/login" class="btn btn-primary">Ingresar</a>
+      }
+    </div>
   }
 </nav>
 
@@ -42,3 +73,5 @@
   <app-avisos-estreno />
   <router-outlet />
 </main>
+
+<app-barra-pwa />

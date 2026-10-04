@@ -49,14 +49,19 @@ export class Cartelera implements OnInit {
 
   async ngOnInit() {
     try {
-      const [peliculas, generos, masVendidas] = await Promise.all([
+      // El ranking de más vendidas se pide aparte: es opcional y, sin conexión, no está guardado.
+      // Así la cartelera se muestra igual (desde la copia guardada) aunque ese pedido falle.
+      this.peliculasService
+        .masVendidas(3)
+        .then((ids) => this.masVendidas.set(ids))
+        .catch((e) => console.warn('No se pudo cargar el ranking de más vendidas', e));
+
+      const [peliculas, generos] = await Promise.all([
         this.peliculasService.listarVisibles(),
         this.peliculasService.listarGeneros(),
-        this.peliculasService.masVendidas(3),
       ]);
       this.peliculas.set(peliculas);
       this.generos.set(generos);
-      this.masVendidas.set(masVendidas);
     } catch (e) {
       console.error('Error al cargar la cartelera', e);
     } finally {

@@ -113,11 +113,14 @@
 
       <button
         class="btn btn-primary validar"
-        [disabled]="bloqueo() !== null || validando()"
+        [disabled]="bloqueo() !== null || validando() || !pwa.online()"
         (click)="validar()"
       >
         {{ textoBoton() }}
       </button>
+      @if (!pwa.online()) {
+        <p class="form-error">Sin conexión: no se puede validar hasta recuperar internet.</p>
+      }
     </div>
 
     <button class="btn btn-ghost siguiente" (click)="siguiente()">Escanear otro código</button>

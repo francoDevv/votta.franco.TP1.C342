@@ -3,6 +3,7 @@ import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { ButacasService, PreciosFuncion, PRECIOS_VACIOS } from '../../services/butacas.service';
+import { PwaService } from '../../services/pwa.service';
 import { SalasService, Butaca } from '../../services/salas.service';
 import { FuncionesService, Funcion } from '../../services/funciones.service';
 
@@ -20,6 +21,7 @@ export class SeleccionButacas implements OnInit, OnDestroy {
   private salasService = inject(SalasService);
   private funcionesService = inject(FuncionesService);
   private router = inject(Router);
+  protected pwa = inject(PwaService);
 
   funcion = signal<Funcion | null>(null);
   butacas = signal<Butaca[]>([]);
@@ -99,6 +101,10 @@ export class SeleccionButacas implements OnInit, OnDestroy {
 
   async alternar(b: Butaca) {
     if (!this.puedeClickear(b)) return;
+    if (!this.pwa.online()) {
+      this.error.set('Sin conexión: necesitás internet para elegir butacas.');
+      return;
+    }
     this.error.set('');
 
     if (this.misButacas().has(b.id)) {

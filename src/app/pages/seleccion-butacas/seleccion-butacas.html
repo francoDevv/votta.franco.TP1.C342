@@ -55,9 +55,12 @@
         </div>
         <strong>Total: ${{ total() }}</strong>
       </div>
-      <button class="btn btn-primary" style="margin-top: 12px;" (click)="continuar()">
+      <button class="btn btn-primary" style="margin-top: 12px;" [disabled]="!pwa.online()" (click)="continuar()">
         Continuar con la compra
       </button>
+      @if (!pwa.online()) {
+        <p class="form-error" style="margin-top: 8px;">Sin conexión: necesitás internet para continuar.</p>
+      }
     }
   </div>
 }

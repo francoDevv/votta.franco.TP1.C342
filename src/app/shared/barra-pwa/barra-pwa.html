@@ -1,0 +1,29 @@
+<div class="avisos" aria-live="polite">
+  @if (!pwa.online()) {
+    <div class="aviso aviso--sin-conexion" role="status">
+      <span>Sin conexión. Podés ver la cartelera guardada, pero para comprar o validar necesitás internet.</span>
+    </div>
+  }
+
+  @if (pwa.actualizacionLista()) {
+    <div class="aviso" role="status">
+      <span>Hay una nueva versión de Cine Fran.</span>
+      <button type="button" class="btn btn-primary" (click)="pwa.actualizar()">Actualizar</button>
+    </div>
+  }
+
+  @if (mostrarInstalacion()) {
+    <div class="aviso" role="status">
+      <span>Instalá Cine Fran en tu dispositivo para abrirla más rápido.</span>
+      <div class="aviso__acciones">
+        <button type="button" class="btn btn-primary" (click)="pwa.instalar()">Instalar</button>
+        <button type="button" class="btn btn-ghost" (click)="pwa.descartarAvisoInstalacion()">Ahora no</button>
+      </div>
+    </div>
+  } @else if (mostrarInstruccionesIos()) {
+    <div class="aviso" role="status">
+      <span>Para instalar la app tocá <strong>Compartir</strong> y después <strong>Agregar a inicio</strong>.</span>
+      <button type="button" class="btn btn-ghost" (click)="pwa.descartarAvisoInstalacion()">Entendido</button>
+    </div>
+  }
+</div>

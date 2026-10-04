@@ -4,6 +4,7 @@ import localeEsAr from '@angular/common/locales/es-AR';
 import { EntradasService, MiCompra } from '../../services/entradas.service';
 import { ComprasService } from '../../services/compras.service';
 import { AuthService } from '../../services/auth.service';
+import { PwaService } from '../../services/pwa.service';
 
 registerLocaleData(localeEsAr);
 
@@ -19,6 +20,7 @@ export class MisEntradas implements OnInit {
   private entradasService = inject(EntradasService);
   private comprasService = inject(ComprasService);
   private auth = inject(AuthService);
+  protected pwa = inject(PwaService);
 
   compras = signal<MiCompra[]>([]);
   credito = signal(0);

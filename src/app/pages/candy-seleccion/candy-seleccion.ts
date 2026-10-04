@@ -10,6 +10,7 @@ import { ComprasService, DetalleCompra } from '../../services/compras.service';
 import { AuthService } from '../../services/auth.service';
 import { EntradasService } from '../../services/entradas.service';
 import { PuntosService, Recompensa } from '../../services/puntos.service';
+import { PwaService } from '../../services/pwa.service';
 
 @Component({
   selector: 'app-candy-seleccion',
@@ -27,6 +28,7 @@ export class CandySeleccion implements OnInit {
   private comprasService = inject(ComprasService);
   private entradasService = inject(EntradasService);
   private puntosService = inject(PuntosService);
+  protected pwa = inject(PwaService);
   protected auth = inject(AuthService);
 
   precios = signal<PreciosFuncion>(PRECIOS_VACIOS);
@@ -139,6 +141,7 @@ export class CandySeleccion implements OnInit {
   puntosAGanar = computed(() => (this.auth.rol() === 'cliente' ? Math.floor(this.totalFinal()) : 0));
 
   puedeConfirmar = computed(() => {
+    if (!this.pwa.online()) return false;
     if (this.entradasSeleccionadas().length === 0) return false;
     if (!this.auth.logueado() && !this.mailContacto().trim()) return false;
     if (this.requiereAviso() && !this.aceptaRestriccion()) return false;

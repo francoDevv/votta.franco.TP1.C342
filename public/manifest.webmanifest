@@ -1,0 +1,24 @@
+{
+  "name": "Cine Fran",
+  "short_name": "Cine Fran",
+  "description": "Cartelera, entradas y candy de Cine Fran.",
+  "id": "/",
+  "start_url": "/cartelera",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1A1412",
+  "theme_color": "#1A1412",
+  "lang": "es-AR",
+  "categories": ["entertainment"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Mis entradas", "url": "/mis-entradas", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }] },
+    { "name": "Próximamente", "url": "/proximamente", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" }] }
+  ]
+}

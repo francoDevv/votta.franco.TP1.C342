@@ -2,6 +2,7 @@ import { AfterViewInit, Component, OnDestroy, computed, inject, signal } from '@
 import { DatePipe } from '@angular/common';
 import { Html5Qrcode } from 'html5-qrcode';
 import { CompraQr, ValidacionService } from '../../services/validacion.service';
+import { PwaService } from '../../services/pwa.service';
 
 type Modo = 'camara' | 'manual';
 
@@ -13,6 +14,7 @@ type Modo = 'camara' | 'manual';
 })
 export class Validacion implements AfterViewInit, OnDestroy {
   private servicio = inject(ValidacionService);
+  protected pwa = inject(PwaService);
   private lector: Html5Qrcode | null = null;
 
   modo = signal<Modo>('camara');
