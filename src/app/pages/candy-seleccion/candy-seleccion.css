@@ -1,2 +1,37 @@
 .producto-item { text-align: center; }
 .resumen-compra { max-width: 480px; margin-top: 28px; }
+
+.aviso-restriccion {
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: rgba(212, 160, 60, 0.12);
+  border: 1px solid rgba(212, 160, 60, 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.aviso-restriccion p {
+  margin: 0;
+}
+
+.aviso-restriccion__titulo {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.aviso-restriccion__check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.aviso-restriccion__check input {
+  margin-top: 3px;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}

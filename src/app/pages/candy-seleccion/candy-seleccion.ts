@@ -37,6 +37,7 @@ export class CandySeleccion implements OnInit {
   porcentajeBienvenida = signal<number | null>(null);
 
   mailContacto = signal('');
+  aceptaRestriccion = signal(false);
   confirmando = signal(false);
   errorConfirmar = signal('');
   detalleCompra = signal<DetalleCompra | null>(null);
@@ -44,6 +45,15 @@ export class CandySeleccion implements OnInit {
 
   private cantidadProductos = signal<Map<number, number>>(new Map());
   private cantidadCombos = signal<Map<number, number>>(new Map());
+
+  /** Edad mínima de la película (0 = sin restricción). */
+  restriccion = computed(() => this.funcion()?.peliculas?.restriccion_edad ?? 0);
+
+  /**
+   * Quien no es cliente registrado no tiene fecha de nacimiento verificable:
+   * debe leer el aviso y confirmar explícitamente.
+   */
+  requiereAviso = computed(() => this.restriccion() > 0 && this.auth.rol() !== 'cliente');
 
   totalButacas = computed(() =>
     this.entradasSeleccionadas().reduce((suma, b) => suma + (PRECIOS_BUTACA[b.tipo] ?? 0), 0)
@@ -78,6 +88,7 @@ export class CandySeleccion implements OnInit {
   puedeConfirmar = computed(() => {
     if (this.entradasSeleccionadas().length === 0) return false;
     if (!this.auth.logueado() && !this.mailContacto().trim()) return false;
+    if (this.requiereAviso() && !this.aceptaRestriccion()) return false;
     return true;
   });
 
@@ -166,6 +177,7 @@ export class CandySeleccion implements OnInit {
         combos: this.combosSeleccionados().map((c) => ({ comboId: c.combo.id, cantidad: c.cantidad })),
         mailContacto: this.mailContacto(),
         creditoAUsar: 0,
+        aceptaRestriccion: this.requiereAviso() && this.aceptaRestriccion(),
       });
       this.detalleCompra.set(detalle);
     } catch (e: any) {

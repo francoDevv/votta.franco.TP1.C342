@@ -110,6 +110,25 @@
       </div>
     }
 
+    @if (requiereAviso()) {
+      <div class="aviso-restriccion" role="alert">
+        <p class="aviso-restriccion__titulo">Película +{{ restriccion() }}</p>
+        <p>
+          Esta película es apta solo para mayores de {{ restriccion() }} años. Como estás comprando sin una
+          cuenta registrada, no podemos verificar tu edad. La entrada indica que debe asistir un adulto y el
+          personal del cine puede solicitar documentación en el ingreso.
+        </p>
+        <label class="aviso-restriccion__check">
+          <input
+            type="checkbox"
+            [checked]="aceptaRestriccion()"
+            (change)="aceptaRestriccion.set($any($event.target).checked)"
+          />
+          <span>Leí el aviso de restricción de edad y confirmo que quiero continuar con la compra.</span>
+        </label>
+      </div>
+    }
+
     @if (errorConfirmar()) {
       <p class="form-error">{{ errorConfirmar() }}</p>
     }

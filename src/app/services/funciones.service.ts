@@ -19,9 +19,13 @@ export interface Funcion {
   fin: string;
   formato: Formato;
   idioma: Idioma;
-  peliculas: { nombre: string };
+  peliculas: { nombre: string; restriccion_edad: number };
   salas: { nombre: string };
 }
+
+/** Columnas comunes a todas las consultas que devuelven Funcion. */
+const SELECT_FUNCION =
+  'id, pelicula_id, sala_id, inicio, fin, formato, idioma, peliculas ( nombre, restriccion_edad ), salas ( nombre )';
 
 @Injectable({ providedIn: 'root' })
 export class FuncionesService {
@@ -29,9 +33,9 @@ export class FuncionesService {
 
   async crearRecurrentes(datos: {
     peliculaId: number;
-    diasSemana: number[]; 
-    hora: string;         
-    fechaDesde: string;   
+    diasSemana: number[];
+    hora: string;
+    fechaDesde: string;
     fechaHasta: string;
     formato: Formato;
     idioma: Idioma;
@@ -52,7 +56,7 @@ export class FuncionesService {
   async listarProximas(): Promise<Funcion[]> {
     const { data, error } = await this.supabase
       .from('funciones')
-      .select('id, pelicula_id, sala_id, inicio, fin, formato, idioma, peliculas ( nombre ), salas ( nombre )')
+      .select(SELECT_FUNCION)
       .gte('inicio', new Date().toISOString())
       .order('inicio');
     if (error) throw error;
@@ -67,7 +71,7 @@ export class FuncionesService {
   async listarPorPelicula(peliculaId: number): Promise<Funcion[]> {
     const { data, error } = await this.supabase
       .from('funciones')
-      .select('id, pelicula_id, sala_id, inicio, fin, formato, idioma, peliculas ( nombre ), salas ( nombre )')
+      .select(SELECT_FUNCION)
       .eq('pelicula_id', peliculaId)
       .gte('inicio', new Date().toISOString())
       .order('inicio');
@@ -78,7 +82,7 @@ export class FuncionesService {
   async obtenerPorId(id: number): Promise<Funcion | null> {
     const { data, error } = await this.supabase
       .from('funciones')
-      .select('id, pelicula_id, sala_id, inicio, fin, formato, idioma, peliculas ( nombre ), salas ( nombre )')
+      .select(SELECT_FUNCION)
       .eq('id', id)
       .maybeSingle();
     if (error) throw error;

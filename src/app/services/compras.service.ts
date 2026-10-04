@@ -28,13 +28,14 @@ export interface DetalleCompra {
 export class ComprasService {
   private supabase = inject(SupabaseService).client;
 
-  async confirmar(datos: {
+    async confirmar(datos: {
     funcionId: number;
     sessionId: string;
     productos: { productoId: number; cantidad: number }[];
     combos: { comboId: number; cantidad: number }[];
     mailContacto: string;
     creditoAUsar?: number;
+    aceptaRestriccion?: boolean;
   }): Promise<DetalleCompra> {
     const { data, error } = await this.supabase.rpc('confirmar_compra', {
       p_funcion_id: datos.funcionId,
@@ -45,6 +46,7 @@ export class ComprasService {
       p_combo_cantidades: datos.combos.map((c) => c.cantidad),
       p_mail_contacto: datos.mailContacto || null,
       p_credito_a_usar: datos.creditoAUsar ?? 0,
+      p_acepta_restriccion: datos.aceptaRestriccion ?? false,
     });
     if (error) throw error;
     return data as DetalleCompra;
