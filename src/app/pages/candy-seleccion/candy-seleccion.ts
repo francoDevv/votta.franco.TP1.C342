@@ -1,7 +1,7 @@
 import { Component, OnInit, computed, effect, inject, signal, untracked } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { ButacasService, PreciosFuncion } from '../../services/butacas.service';
+import { ButacasService, PreciosFuncion, PRECIOS_VACIOS } from '../../services/butacas.service';
 import { SalasService, Butaca } from '../../services/salas.service';
 import { FuncionesService, Funcion } from '../../services/funciones.service';
 import { CandyService, Producto, Combo } from '../../services/candy.service';
@@ -25,7 +25,7 @@ export class CandySeleccion implements OnInit {
   private comprasService = inject(ComprasService);
   protected auth = inject(AuthService);
 
-  precios = signal<PreciosFuncion>({ normal: 0, accesible: 0, vip: 0 });
+  precios = signal<PreciosFuncion>(PRECIOS_VACIOS);
 
   funcion = signal<Funcion | null>(null);
   entradasSeleccionadas = signal<Butaca[]>([]);

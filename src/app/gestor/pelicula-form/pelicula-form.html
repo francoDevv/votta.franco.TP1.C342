@@ -35,6 +35,42 @@
     </div>
 
     <div class="field">
+      <label>Fecha de estreno <span class="ticket-meta">(opcional)</span></label>
+      <app-selector-fecha
+        formControlName="fechaEstreno"
+        [permitirVacio]="true"
+        textoVacio="Sin fecha de estreno: ya está en cartelera"
+      />
+    </div>
+
+    @if (calendarioVenta(); as c) {
+      <div class="calendario-venta">
+        <div>
+          <span class="ticket-meta">Abre la venta</span>
+          <strong>{{ c.apertura }}</strong>
+        </div>
+        <div>
+          <span class="ticket-meta">Preventa hasta</span>
+          <strong>{{ c.finPreventa }}</strong>
+        </div>
+        <div>
+          <span class="ticket-meta">Estreno · precio normal</span>
+          <strong>{{ c.estreno }}</strong>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Precio de preventa <span class="ticket-meta">(opcional)</span></label>
+        <input type="number" min="1" step="50" formControlName="precioPreventa" placeholder="Sin precio especial" />
+        @if (!esAdmin()) {
+          <p class="ticket-meta">Solo el administrador puede modificar el precio de preventa.</p>
+        } @else {
+          <p class="ticket-meta">Reemplaza al precio base durante la preventa. El recargo VIP se suma igual.</p>
+        }
+      </div>
+    }
+
+    <div class="field">
       <label>Géneros</label>
       <div class="row">
         @for (g of generosDisponibles(); track g.id) {

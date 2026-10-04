@@ -14,6 +14,8 @@ export interface Pelicula {
   imagen_url: string | null;
   restriccion_edad: number;
   visible_en_home: boolean;
+  fecha_estreno: string | null;
+  precio_preventa: number | null;
   generos: Genero[];
 }
 
@@ -24,6 +26,8 @@ export interface PeliculaDatos {
   restriccion_edad: number;
   visible_en_home: boolean;
   imagen_url?: string;
+  fecha_estreno?: string | null;
+  precio_preventa?: number | null;
 }
 
 export interface Resena {
@@ -36,12 +40,23 @@ export interface Resena {
   clientes: { nombre: string; apellido: string };
 }
 
+/** Columnas comunes a todas las consultas que devuelven Pelicula. */
+const SELECT_PELICULA = `
+  id, nombre, sinopsis, duracion_minutos, imagen_url,
+  restriccion_edad, visible_en_home, fecha_estreno, precio_preventa,
+  pelicula_genero ( generos ( id, nombre ) )
+`;
+
 @Injectable({ providedIn: 'root' })
 export class PeliculasService {
   private supabase = inject(SupabaseService).client;
 
   private mapear(p: any): Pelicula {
-    return { ...p, generos: p.pelicula_genero.map((pg: any) => pg.generos) };
+    return {
+      ...p,
+      precio_preventa: p.precio_preventa === null ? null : Number(p.precio_preventa),
+      generos: p.pelicula_genero.map((pg: any) => pg.generos),
+    };
   }
 
   // Cartelera
@@ -49,11 +64,7 @@ export class PeliculasService {
   async listarVisibles(): Promise<Pelicula[]> {
     const { data, error } = await this.supabase
       .from('peliculas')
-      .select(`
-        id, nombre, sinopsis, duracion_minutos, imagen_url,
-        restriccion_edad, visible_en_home,
-        pelicula_genero ( generos ( id, nombre ) )
-      `)
+      .select(SELECT_PELICULA)
       .eq('visible_en_home', true)
       .order('nombre');
     if (error) throw error;
@@ -80,11 +91,7 @@ export class PeliculasService {
   async listarTodas(): Promise<Pelicula[]> {
     const { data, error } = await this.supabase
       .from('peliculas')
-      .select(`
-        id, nombre, sinopsis, duracion_minutos, imagen_url,
-        restriccion_edad, visible_en_home,
-        pelicula_genero ( generos ( id, nombre ) )
-      `)
+      .select(SELECT_PELICULA)
       .order('nombre');
     if (error) throw error;
     return (data ?? []).map((p) => this.mapear(p));
@@ -93,11 +100,7 @@ export class PeliculasService {
   async obtenerPorId(id: number): Promise<Pelicula | null> {
     const { data, error } = await this.supabase
       .from('peliculas')
-      .select(`
-        id, nombre, sinopsis, duracion_minutos, imagen_url,
-        restriccion_edad, visible_en_home,
-        pelicula_genero ( generos ( id, nombre ) )
-      `)
+      .select(SELECT_PELICULA)
       .eq('id', id)
       .maybeSingle();
     if (error) throw error;

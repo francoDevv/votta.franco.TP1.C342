@@ -8,8 +8,15 @@ export interface DisponibilidadButaca {
   estado: 'libre' | 'reservada' | 'ocupada';
 }
 
-/** Precio por tipo de butaca para una función: { normal, accesible, vip }. */
-export type PreciosFuncion = Record<string, number>;
+/** Precios vigentes de una función, calculados en el servidor. */
+export interface PreciosFuncion {
+  normal: number;
+  accesible: number;
+  vip: number;
+  en_preventa: boolean;
+}
+
+export const PRECIOS_VACIOS: PreciosFuncion = { normal: 0, accesible: 0, vip: 0, en_preventa: false };
 
 const KEY = 'cine_session_id';
 
@@ -57,11 +64,12 @@ export class ButacasService {
   async precios(funcionId: number): Promise<PreciosFuncion> {
     const { data, error } = await this.supabase.rpc('precios_funcion', { p_funcion_id: funcionId });
     if (error) throw error;
-    const p = data as Record<string, number | string>;
+    const p = data as any;
     return {
-      normal: Number(p['normal']),
-      accesible: Number(p['accesible']),
-      vip: Number(p['vip']),
+      normal: Number(p.normal),
+      accesible: Number(p.accesible),
+      vip: Number(p.vip),
+      en_preventa: Boolean(p.en_preventa),
     };
   }
 

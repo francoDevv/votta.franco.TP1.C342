@@ -1,0 +1,38 @@
+<div class="sf" [class.sf--deshabilitado]="deshabilitado()">
+  <div class="sf-cabecera">
+    <span class="sf-valor" [class.sf-valor--vacio]="!valor()">{{ textoValor() }}</span>
+    <div class="sf-nav">
+      <button type="button" class="sf-flecha" (click)="mover(-7)" aria-label="Semana anterior">‹</button>
+      <span class="sf-rango">{{ rango() }}</span>
+      <button type="button" class="sf-flecha" (click)="mover(7)" aria-label="Semana siguiente">›</button>
+    </div>
+  </div>
+
+  <div class="sf-atajos">
+    @if (permitirVacio()) {
+      <button type="button" class="sf-atajo" [class.sf-atajo--activo]="!valor()" (click)="elegir(null)">
+        Sin fecha
+      </button>
+    }
+    @for (a of atajos; track a.dias) {
+      <button type="button" class="sf-atajo" (click)="elegirEn(a.dias)">{{ a.etiqueta }}</button>
+    }
+  </div>
+
+  <div class="sf-dias">
+    @for (d of dias(); track d.iso) {
+      <button
+        type="button"
+        class="sf-dia"
+        [class.sf-dia--hoy]="d.esHoy"
+        [class.sf-dia--activo]="d.iso === valor()"
+        [attr.aria-pressed]="d.iso === valor()"
+        (click)="elegir(d.iso)"
+      >
+        <span class="sf-dia-semana">{{ d.diaSemana }}</span>
+        <span class="sf-dia-numero">{{ d.numero }}</span>
+        <span class="sf-dia-mes">{{ d.mes }}</span>
+      </button>
+    }
+  </div>
+</div>

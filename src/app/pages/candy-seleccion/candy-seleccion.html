@@ -26,7 +26,12 @@
   <p class="ticket-meta">{{ funcion()!.salas.nombre }} · {{ funcion()!.inicio | date: 'dd/MM/yyyy · HH:mm' }}</p>
 
   <div class="card" style="max-width: 480px; margin: 20px 0;">
-    <h3 style="margin-top: 0;">Tus entradas</h3>
+    <h3 style="margin-top: 0;">
+      Tus entradas
+      @if (precios().en_preventa) {
+        <span class="chip">Precio de preventa</span>
+      }
+    </h3>
     @for (b of entradasSeleccionadas(); track b.id) {
       <div class="row" style="justify-content: space-between;">
         <span>{{ b.fila }}{{ b.numero }} <span class="chip">{{ b.tipo }}</span></span>

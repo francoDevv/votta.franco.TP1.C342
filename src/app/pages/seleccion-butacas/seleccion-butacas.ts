@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { RealtimeChannel } from '@supabase/supabase-js';
-import { ButacasService, PreciosFuncion } from '../../services/butacas.service';
+import { ButacasService, PreciosFuncion, PRECIOS_VACIOS } from '../../services/butacas.service';
 import { SalasService, Butaca } from '../../services/salas.service';
 import { FuncionesService, Funcion } from '../../services/funciones.service';
 
@@ -23,7 +23,7 @@ export class SeleccionButacas implements OnInit, OnDestroy {
 
   funcion = signal<Funcion | null>(null);
   butacas = signal<Butaca[]>([]);
-  precios = signal<PreciosFuncion>({ normal: 0, accesible: 0, vip: 0 });
+  precios = signal<PreciosFuncion>(PRECIOS_VACIOS);
   disponibilidad = signal<Map<number, string>>(new Map());
   misButacas = signal<Set<number>>(new Set());
   cargando = signal(true);
