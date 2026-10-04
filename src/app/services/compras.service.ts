@@ -27,6 +27,19 @@ export interface DetalleCompra {
   total: number;
 }
 
+/** Fecha y hora de la función en hora de Argentina. Ej: sábado 04/10/2026 · 20:00 hs */
+function fechaHoraFuncion(iso: string): string {
+  const fecha = new Date(iso);
+  const zona = 'America/Argentina/Buenos_Aires';
+  const dia = fecha.toLocaleDateString('es-AR', {
+    timeZone: zona, weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric',
+  });
+  const hora = fecha.toLocaleTimeString('es-AR', {
+    timeZone: zona, hour: '2-digit', minute: '2-digit', hour12: false,
+  });
+  return `${dia.replace(',', '')} · ${hora} hs`;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ComprasService {
   private supabase = inject(SupabaseService).client;
@@ -77,7 +90,7 @@ export class ComprasService {
     doc.setFontSize(12);
     doc.text(`Película: ${detalle.pelicula}`, 20, y); y += 8;
     doc.text(`Sala: ${detalle.sala}`, 20, y); y += 8;
-    doc.text(`Función: ${new Date(detalle.inicio).toLocaleString('es-AR')}`, 20, y); y += 8;
+    doc.text(`Función: ${fechaHoraFuncion(detalle.inicio)}`, 20, y); y += 8;
     doc.text(`Formato: ${detalle.formato} · Idioma: ${detalle.idioma}`, 20, y); y += 8;
 
     if (detalle.restriccion_edad > 0) {
@@ -88,7 +101,8 @@ export class ComprasService {
     y += 4;
     doc.text('Butacas:', 20, y); y += 8;
     for (const b of detalle.butacas) {
-      doc.text(`  ${b.fila}${b.numero} (${b.tipo}) — $${b.precio}`, 20, y);
+      const precio = Number(b.precio) === 0 ? 'canjeada con puntos' : `$${b.precio}`;
+      doc.text(`  ${b.fila}${b.numero} (${b.tipo}) — ${precio}`, 20, y);
       y += 7;
     }
 
@@ -96,7 +110,8 @@ export class ComprasService {
       y += 4;
       doc.text('Candy:', 20, y); y += 8;
       for (const p of detalle.productos) {
-        doc.text(`  ${p.cantidad}x ${p.nombre} — $${p.precio_unitario * p.cantidad}`, 20, y);
+        const precio = Number(p.precio_unitario) === 0 ? 'canjeado con puntos' : `$${p.precio_unitario * p.cantidad}`;
+        doc.text(`  ${p.cantidad}x ${p.nombre} — ${precio}`, 20, y);
         y += 7;
       }
     }

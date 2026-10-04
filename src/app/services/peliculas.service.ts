@@ -89,6 +89,13 @@ export class PeliculasService {
     return (data ?? []).map((p) => this.mapear(p));
   }
 
+  /** Ids de las películas más vendidas de los últimos 30 días, de la 1.ª a la última. */
+  async masVendidas(limite = 3): Promise<number[]> {
+    const { data, error } = await this.supabase.rpc('peliculas_mas_vendidas', { p_limite: limite });
+    if (error) throw error;
+    return ((data ?? []) as any[]).map((r) => Number(r.pelicula_id));
+  }
+
   /** Películas visibles que todavía no se estrenaron, de la más próxima a la más lejana. */
   async listarProximamente(): Promise<Pelicula[]> {
     const { data, error } = await this.supabase

@@ -12,7 +12,7 @@
   <p>Cargando…</p>
 } @else {
   <div class="grid-cards">
-    @for (c of compras(); track c.compra_id) {
+    @for (c of comprasOrdenadas(); track c.compra_id) {
       <div class="card compra">
         <div>
           <p class="ticket-title">{{ c.pelicula }}</p>
@@ -68,8 +68,11 @@
         </dl>
 
         <p class="chip">Compra {{ c.estado }}</p>
+        @if (c.estado === 'cancelada') {
+          <p class="aviso-cancelacion">El importe de esta compra se acreditó como crédito en tu cuenta.</p>
+        }
 
-        @if (c.estado === 'confirmada') {
+        @if (puedeDescargar(c)) {
           <button
             class="btn btn-ghost"
             [disabled]="descargando() === c.compra_id"

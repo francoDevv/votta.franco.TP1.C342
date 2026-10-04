@@ -13,6 +13,7 @@ export interface Producto {
   descripcion: string | null;
   precio: number;
   disponible: boolean;
+  imagen_url: string | null;
   categorias_candy: { nombre: string };
 }
 
@@ -22,6 +23,7 @@ export interface ProductoDatos {
   descripcion: string;
   precio: number;
   disponible: boolean;
+  imagen_url?: string | null;
 }
 
 export interface Combo {
@@ -31,6 +33,7 @@ export interface Combo {
   precio: number;
   destacado: boolean;
   disponible: boolean;
+  imagen_url: string | null;
   items: { producto_id: number; cantidad: number; productos: { nombre: string } }[];
 }
 
@@ -40,11 +43,27 @@ export interface ComboDatos {
   precio: number;
   destacado: boolean;
   disponible: boolean;
+  imagen_url?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
 export class CandyService {
   private supabase = inject(SupabaseService).client;
+
+  // Imágenes (bucket público "candy")
+
+  async subirImagen(file: File): Promise<string> {
+    const extension = file.name.split('.').pop();
+    const path = `${crypto.randomUUID()}.${extension}`;
+    const { error } = await this.supabase.storage.from('candy').upload(path, file);
+    if (error) throw error;
+    return path;
+  }
+
+  urlImagen(path: string | null | undefined): string | null {
+    if (!path) return null;
+    return this.supabase.storage.from('candy').getPublicUrl(path).data.publicUrl;
+  }
 
   async listarCategorias(): Promise<CategoriaCandy[]> {
     const { data, error } = await this.supabase.from('categorias_candy').select('id, nombre').order('nombre');
@@ -65,7 +84,7 @@ export class CandyService {
   async listarProductos(soloDisponibles = false): Promise<Producto[]> {
     let query = this.supabase
       .from('productos')
-      .select('id, categoria_id, nombre, descripcion, precio, disponible, categorias_candy ( nombre )')
+      .select('id, categoria_id, nombre, descripcion, precio, disponible, imagen_url, categorias_candy ( nombre )')
       .order('nombre');
     if (soloDisponibles) query = query.eq('disponible', true);
     const { data, error } = await query;
@@ -76,7 +95,7 @@ export class CandyService {
   async obtenerProducto(id: number): Promise<Producto | null> {
     const { data, error } = await this.supabase
       .from('productos')
-      .select('id, categoria_id, nombre, descripcion, precio, disponible, categorias_candy ( nombre )')
+      .select('id, categoria_id, nombre, descripcion, precio, disponible, imagen_url, categorias_candy ( nombre )')
       .eq('id', id)
       .maybeSingle();
     if (error) throw error;
@@ -101,7 +120,7 @@ export class CandyService {
   async listarCombos(soloDisponibles = false): Promise<Combo[]> {
   let query = this.supabase
     .from('combos')
-    .select('id, nombre, descripcion, precio, destacado, disponible, combo_items ( producto_id, cantidad, productos ( nombre ) )')
+    .select('id, nombre, descripcion, precio, destacado, disponible, imagen_url, combo_items ( producto_id, cantidad, productos ( nombre ) )')
     .order('nombre');
   if (soloDisponibles) query = query.eq('disponible', true);
   const { data, error } = await query;
@@ -112,7 +131,7 @@ export class CandyService {
     async obtenerCombo(id: number): Promise<Combo | null> {
     const { data, error } = await this.supabase
         .from('combos')
-        .select('id, nombre, descripcion, precio, destacado, disponible, combo_items ( producto_id, cantidad, productos ( nombre ) )')
+        .select('id, nombre, descripcion, precio, destacado, disponible, imagen_url, combo_items ( producto_id, cantidad, productos ( nombre ) )')
         .eq('id', id)
         .maybeSingle();
     if (error) throw error;

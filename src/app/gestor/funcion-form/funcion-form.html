@@ -1,6 +1,6 @@
 <a routerLink="/gestor/funciones" class="back-link">‹ Volver a funciones</a>
 
-<div class="card" style="max-width: 620px;">
+<div class="card" style="max-width: 760px;">
   <h1>Nueva función</h1>
 
   <form [formGroup]="form" (ngSubmit)="guardar()">
@@ -26,18 +26,19 @@
       </div>
     </div>
 
-    <div class="row">
-      <div class="field">
-        <label>Hora</label>
-        <input type="time" formControlName="hora" />
-      </div>
+    <div class="field">
+      <label>Hora de inicio</label>
+      <app-selector-hora formControlName="hora" />
+    </div>
+
+    <div class="fechas-rango">
       <div class="field">
         <label>Desde</label>
-        <input type="date" formControlName="fechaDesde" />
+        <app-selector-fecha formControlName="fechaDesde" />
       </div>
       <div class="field">
         <label>Hasta</label>
-        <input type="date" formControlName="fechaHasta" />
+        <app-selector-fecha formControlName="fechaHasta" />
       </div>
     </div>
 

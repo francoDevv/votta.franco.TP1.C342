@@ -1,0 +1,40 @@
+:host {
+  display: block;
+}
+
+.sh {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-alt);
+}
+
+.sh--deshabilitado {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.sh-hora {
+  padding: 6px 0;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.sh-hora:hover {
+  border-color: var(--text-muted);
+}
+
+.sh-hora--activa,
+.sh-hora--activa:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}

@@ -1,0 +1,19 @@
+<div class="si">
+  <div class="si-vista">
+    @if (vista(); as url) {
+      <img [src]="url" alt="Vista previa" />
+    } @else {
+      <span>Sin imagen</span>
+    }
+  </div>
+  <div class="si-acciones">
+    <input type="file" accept="image/*" hidden #entrada (change)="elegir($event)" />
+    <button type="button" class="btn btn-ghost" (click)="entrada.click()">
+      {{ vista() ? 'Cambiar imagen' : 'Elegir imagen' }}
+    </button>
+    @if (archivo(); as a) {
+      <span class="ticket-meta">{{ a.name }}</span>
+      <button type="button" class="btn btn-danger" (click)="quitar(entrada)">Descartar</button>
+    }
+  </div>
+</div>

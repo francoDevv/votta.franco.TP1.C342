@@ -11,7 +11,16 @@
     <tbody>
       @for (c of combos(); track c.id) {
         <tr>
-          <td>{{ c.nombre }}</td>
+          <td>
+            <div class="con-miniatura">
+              @if (urlImagen(c.imagen_url); as url) {
+                <img [src]="url" alt="" />
+              } @else {
+                <span class="sin-miniatura"></span>
+              }
+              {{ c.nombre }}
+            </div>
+          </td>
           <td>{{ c.items.map(i => i.cantidad + 'x ' + i.productos.nombre).join(', ') }}</td>
           <td>${{ c.precio }}</td>
           <td>{{ c.destacado ? 'Sí' : 'No' }}</td>

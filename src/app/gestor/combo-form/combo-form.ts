@@ -2,12 +2,13 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CandyService, Producto } from '../../services/candy.service';
+import { SelectorImagen } from '../../shared/selector-imagen/selector-imagen';
 
 interface ItemSeleccionado { producto_id: number; cantidad: number; }
 
 @Component({
   selector: 'app-combo-form',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, SelectorImagen],
   templateUrl: './combo-form.html',
   styleUrl: './combo-form.css',
 })
@@ -20,6 +21,8 @@ export class ComboForm implements OnInit {
   comboId = signal<number | null>(null);
   productos = signal<Producto[]>([]);
   items = signal<ItemSeleccionado[]>([]);
+  imagenActualUrl = signal<string | null>(null);
+  archivoImagen = signal<File | null>(null);
   guardando = signal(false);
   error = signal('');
 
@@ -47,6 +50,7 @@ export class ComboForm implements OnInit {
           destacado: combo.destacado,
           disponible: combo.disponible,
         });
+        this.imagenActualUrl.set(this.candyService.urlImagen(combo.imagen_url));
         this.items.set(combo.items.map((i) => ({ producto_id: i.producto_id, cantidad: i.cantidad })));
       }
     }
@@ -78,7 +82,11 @@ export class ComboForm implements OnInit {
     this.guardando.set(true);
     this.error.set('');
     try {
-      await this.candyService.guardarCombo(this.form.getRawValue(), this.items(), this.comboId() ?? undefined);
+      const datos: any = this.form.getRawValue();
+      if (this.archivoImagen()) {
+        datos.imagen_url = await this.candyService.subirImagen(this.archivoImagen()!);
+      }
+      await this.candyService.guardarCombo(datos, this.items(), this.comboId() ?? undefined);
       this.router.navigateByUrl('/gestor/combos');
     } catch (e) {
       console.error(e);

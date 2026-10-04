@@ -33,6 +33,9 @@
             }
           </div>
           <div class="ticket-body">
+            @if (puestoTop(p.id); as puesto) {
+              <span class="ticket-badge ticket-badge-inline">#{{ puesto }} más vendida</span>
+            }
             <p class="ticket-title">{{ p.nombre }}</p>
             <p class="ticket-meta">{{ p.duracion_minutos }} min · {{ p.generos.map(g => g.nombre).join(', ') }}</p>
           </div>

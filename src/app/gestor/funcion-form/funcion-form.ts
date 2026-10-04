@@ -3,6 +3,9 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { FuncionesService, ResultadoAsignacion } from '../../services/funciones.service';
 import { PeliculasService, Pelicula } from '../../services/peliculas.service';
+import { SelectorFecha } from '../../shared/selector-fecha/selector-fecha';
+import { SelectorHora } from '../../shared/selector-hora/selector-hora';
+import { aIso, hoy, sumarDias } from '../../shared/fechas';
 
 const DIAS = [
   { valor: 0, nombre: 'Domingo' }, { valor: 1, nombre: 'Lunes' }, { valor: 2, nombre: 'Martes' },
@@ -12,7 +15,7 @@ const DIAS = [
 
 @Component({
   selector: 'app-funcion-form',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, SelectorFecha, SelectorHora],
   templateUrl: './funcion-form.html',
   styleUrl: './funcion-form.css',
 })
@@ -32,8 +35,8 @@ export class FuncionForm implements OnInit {
   form = this.fb.group({
     peliculaId: [0, Validators.required],
     hora: ['18:00', Validators.required],
-    fechaDesde: ['', Validators.required],
-    fechaHasta: ['', Validators.required],
+    fechaDesde: this.fb.control<string | null>(aIso(hoy()), Validators.required),
+    fechaHasta: this.fb.control<string | null>(aIso(sumarDias(hoy(), 6)), Validators.required),
     formato: ['2D' as const, Validators.required],
     idioma: ['castellano' as const, Validators.required],
   });
@@ -53,18 +56,23 @@ export class FuncionForm implements OnInit {
       this.error.set('Completá todos los campos y elegí al menos un día.');
       return;
     }
+    const v = this.form.getRawValue();
+    if (v.fechaHasta! < v.fechaDesde!) {
+      this.error.set('La fecha "hasta" no puede ser anterior a la fecha "desde".');
+      return;
+    }
+
     this.guardando.set(true);
     this.error.set('');
     this.resultado.set(null);
 
     try {
-      const v = this.form.getRawValue();
       const resultado = await this.funcionesService.crearRecurrentes({
         peliculaId: v.peliculaId,
         diasSemana: Array.from(this.diasSeleccionados()),
         hora: v.hora,
-        fechaDesde: v.fechaDesde,
-        fechaHasta: v.fechaHasta,
+        fechaDesde: v.fechaDesde!,
+        fechaHasta: v.fechaHasta!,
         formato: v.formato,
         idioma: v.idioma,
       });

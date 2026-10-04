@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { DatePipe, DecimalPipe, registerLocaleData } from '@angular/common';
 import localeEsAr from '@angular/common/locales/es-AR';
 import { EntradasService, MiCompra } from '../../services/entradas.service';
@@ -27,6 +27,20 @@ export class MisEntradas implements OnInit {
   descargando = signal<number | null>(null);
   error = signal('');
 
+  /**
+   * Primero las próximas funciones (de la más cercana a la más lejana),
+   * después las finalizadas y canceladas (de la más reciente a la más vieja).
+   */
+  comprasOrdenadas = computed(() => {
+    const proximas = this.compras()
+      .filter((c) => this.esProxima(c))
+      .sort((a, b) => a.inicio.localeCompare(b.inicio));
+    const resto = this.compras()
+      .filter((c) => !this.esProxima(c))
+      .sort((a, b) => b.inicio.localeCompare(a.inicio));
+    return [...proximas, ...resto];
+  });
+
   async ngOnInit() {
     await this.cargar();
   }
@@ -41,6 +55,23 @@ export class MisEntradas implements OnInit {
     this.compras.set(compras);
     this.credito.set(credito);
     this.cargando.set(false);
+  }
+
+  private esProxima(c: MiCompra): boolean {
+    return c.estado === 'confirmada' && !this.funcionTerminada(c);
+  }
+
+  funcionTerminada(c: MiCompra): boolean {
+    return Date.now() >= new Date(c.fin).getTime();
+  }
+
+  /** El PDF solo tiene sentido mientras la entrada se puede usar. */
+  puedeDescargar(c: MiCompra): boolean {
+    return (
+      c.estado === 'confirmada' &&
+      !this.funcionTerminada(c) &&
+      c.entradas.every((e) => e.estado === 'activa')
+    );
   }
 
   subtotalEntradas(c: MiCompra): number {

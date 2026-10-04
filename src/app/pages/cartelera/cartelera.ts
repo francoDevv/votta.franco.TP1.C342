@@ -16,6 +16,9 @@ export class Cartelera implements OnInit {
   generos = signal<Genero[]>([]);
   cargando = signal(true);
 
+  /** Ids de las 3 más vendidas, en orden (mail del 16/01). */
+  masVendidas = signal<number[]>([]);
+
   busqueda = signal('');
   generoSeleccionado = signal<number | null>(null);
 
@@ -23,21 +26,37 @@ export class Cartelera implements OnInit {
     const texto = this.busqueda().toLowerCase().trim();
     const genero = this.generoSeleccionado();
 
-    return this.peliculas().filter((p) => {
+    const filtradas = this.peliculas().filter((p) => {
       const coincideTexto = !texto || p.nombre.toLowerCase().includes(texto);
       const coincideGenero = !genero || p.generos.some((g) => g.id === genero);
       return coincideTexto && coincideGenero;
     });
+
+    // Las más vendidas van primero, en su orden; el resto sigue por nombre
+    const top = this.masVendidas();
+    const puesto = (id: number) => {
+      const i = top.indexOf(id);
+      return i === -1 ? Number.MAX_SAFE_INTEGER : i;
+    };
+    return [...filtradas].sort((a, b) => puesto(a.id) - puesto(b.id) || a.nombre.localeCompare(b.nombre));
   });
+
+  /** Puesto en el ranking (1, 2 o 3) o null si no está entre las más vendidas. */
+  puestoTop(id: number): number | null {
+    const i = this.masVendidas().indexOf(id);
+    return i === -1 ? null : i + 1;
+  }
 
   async ngOnInit() {
     try {
-      const [peliculas, generos] = await Promise.all([
+      const [peliculas, generos, masVendidas] = await Promise.all([
         this.peliculasService.listarVisibles(),
         this.peliculasService.listarGeneros(),
+        this.peliculasService.masVendidas(3),
       ]);
       this.peliculas.set(peliculas);
       this.generos.set(generos);
+      this.masVendidas.set(masVendidas);
     } catch (e) {
       console.error('Error al cargar la cartelera', e);
     } finally {

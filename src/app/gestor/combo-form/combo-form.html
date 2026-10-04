@@ -13,6 +13,10 @@
       <textarea formControlName="descripcion"></textarea>
     </div>
     <div class="field">
+      <label>Imagen</label>
+      <app-selector-imagen [urlActual]="imagenActualUrl()" (archivoCambiado)="archivoImagen.set($event)" />
+    </div>
+    <div class="field">
       <label>Precio fijo del combo</label>
       <input type="number" formControlName="precio" step="0.01" />
     </div>

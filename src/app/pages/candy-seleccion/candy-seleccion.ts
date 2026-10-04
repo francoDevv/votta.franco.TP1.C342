@@ -219,6 +219,10 @@ export class CandySeleccion implements OnInit {
     this.cargando.set(false);
   }
 
+  urlImagen(path: string | null) {
+    return this.candyService.urlImagen(path);
+  }
+
   cantidadProducto(id: number): number {
     return this.cantidadProductos().get(id) ?? 0;
   }

@@ -1,0 +1,16 @@
+.con-miniatura {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.con-miniatura img,
+.sin-miniatura {
+  width: 44px;
+  height: 33px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border-radius: 4px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+}

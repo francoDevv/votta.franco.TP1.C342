@@ -14,6 +14,10 @@ export class ProductosAdmin implements OnInit {
   productos = signal<Producto[]>([]);
   cargando = signal(true);
 
+  urlImagen(path: string | null) {
+    return this.candyService.urlImagen(path);
+  }
+
   async ngOnInit() {
     await this.cargar();
   }

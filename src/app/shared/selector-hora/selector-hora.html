@@ -1,0 +1,14 @@
+<div class="sh" [class.sh--deshabilitado]="deshabilitado()" role="listbox" aria-label="Hora">
+  @for (h of horas(); track h) {
+    <button
+      type="button"
+      class="sh-hora"
+      role="option"
+      [class.sh-hora--activa]="h === valor()"
+      [attr.aria-selected]="h === valor()"
+      (click)="elegir(h)"
+    >
+      {{ h }}
+    </button>
+  }
+</div>

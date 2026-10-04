@@ -2,10 +2,11 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CandyService, CategoriaCandy } from '../../services/candy.service';
+import { SelectorImagen } from '../../shared/selector-imagen/selector-imagen';
 
 @Component({
   selector: 'app-producto-form',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, SelectorImagen],
   templateUrl: './producto-form.html',
   styleUrl: './producto-form.css',
 })
@@ -17,6 +18,8 @@ export class ProductoForm implements OnInit {
 
   productoId = signal<number | null>(null);
   categorias = signal<CategoriaCandy[]>([]);
+  imagenActualUrl = signal<string | null>(null);
+  archivoImagen = signal<File | null>(null);
   guardando = signal(false);
   error = signal('');
 
@@ -44,6 +47,7 @@ export class ProductoForm implements OnInit {
           precio: producto.precio,
           disponible: producto.disponible,
         });
+        this.imagenActualUrl.set(this.candyService.urlImagen(producto.imagen_url));
       }
     }
   }
@@ -53,7 +57,11 @@ export class ProductoForm implements OnInit {
     this.guardando.set(true);
     this.error.set('');
     try {
-      await this.candyService.guardarProducto(this.form.getRawValue(), this.productoId() ?? undefined);
+      const datos: any = this.form.getRawValue();
+      if (this.archivoImagen()) {
+        datos.imagen_url = await this.candyService.subirImagen(this.archivoImagen()!);
+      }
+      await this.candyService.guardarProducto(datos, this.productoId() ?? undefined);
       this.router.navigateByUrl('/gestor/productos');
     } catch (e) {
       console.error(e);

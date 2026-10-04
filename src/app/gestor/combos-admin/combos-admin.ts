@@ -14,6 +14,10 @@ export class CombosAdmin implements OnInit {
   combos = signal<Combo[]>([]);
   cargando = signal(true);
 
+  urlImagen(path: string | null) {
+    return this.candyService.urlImagen(path);
+  }
+
   async ngOnInit() {
     await this.cargar();
   }

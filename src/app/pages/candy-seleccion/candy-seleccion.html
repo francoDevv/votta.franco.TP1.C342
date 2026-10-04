@@ -47,6 +47,9 @@
   <div class="grid-cards">
     @for (p of productos(); track p.id) {
       <div class="card producto-item">
+        @if (urlImagen(p.imagen_url); as url) {
+          <img class="candy-img" [src]="url" [alt]="p.nombre" loading="lazy" />
+        }
         <p class="ticket-title">{{ p.nombre }}</p>
         <p class="ticket-meta">${{ p.precio }}</p>
         <div class="row" style="justify-content: center; margin-top: 10px;">
@@ -65,6 +68,9 @@
     <div class="grid-cards">
       @for (c of combos(); track c.id) {
         <div class="ticket-card">
+          @if (urlImagen(c.imagen_url); as url) {
+            <img class="candy-img candy-img--combo" [src]="url" [alt]="c.nombre" loading="lazy" />
+          }
           <div class="ticket-body">
             @if (c.destacado) {
               <span class="ticket-badge ticket-badge-inline">Destacado</span>
