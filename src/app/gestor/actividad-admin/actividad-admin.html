@@ -1,0 +1,85 @@
+<h1>Log de actividad</h1>
+<p class="ticket-meta" style="margin-bottom: 20px;">
+  Quién creó o eliminó funciones, quién modificó precios y quién validó cada QR, con fecha y hora.
+</p>
+
+<form class="card filtros" [formGroup]="filtros">
+  <div class="filtros__atajos">
+    @for (a of atajos; track a.dias) {
+      <button type="button" class="btn btn-ghost" (click)="aplicarAtajo(a.dias)">{{ a.etiqueta }}</button>
+    }
+  </div>
+
+  <div class="filtros__fechas">
+    <div class="field">
+      <label>Desde</label>
+      <app-selector-fecha formControlName="desde" />
+    </div>
+    <div class="field">
+      <label>Hasta</label>
+      <app-selector-fecha formControlName="hasta" />
+    </div>
+  </div>
+
+  <div class="filtros__selects">
+    <div class="field">
+      <label>Acción</label>
+      <select formControlName="accion">
+        <option [ngValue]="null">Todas las acciones</option>
+        @for (a of acciones; track a.valor) {
+          <option [ngValue]="a.valor">{{ a.etiqueta }}</option>
+        }
+      </select>
+    </div>
+    <div class="field">
+      <label>Usuario</label>
+      <select formControlName="usuarioId">
+        <option [ngValue]="null">Todos los usuarios</option>
+        @for (u of usuarios(); track u.usuario_id) {
+          <option [ngValue]="u.usuario_id">{{ u.nombre }} ({{ u.rol }})</option>
+        }
+      </select>
+    </div>
+  </div>
+</form>
+
+@if (error()) {
+  <p class="form-error">{{ error() }}</p>
+}
+
+<div class="resultado">
+  <span class="ticket-meta">{{ cargando() ? 'Cargando…' : rango() }}</span>
+  <div class="row">
+    <button type="button" class="btn btn-ghost" [disabled]="pagina() === 0 || cargando()" (click)="cambiarPagina(-1)">
+      ‹ Anteriores
+    </button>
+    <button type="button" class="btn btn-ghost" [disabled]="!hayPaginaSiguiente() || cargando()" (click)="cambiarPagina(1)">
+      Siguientes ›
+    </button>
+  </div>
+</div>
+
+<div class="tabla-scroll">
+  <table>
+    <thead>
+      <tr><th>Fecha y hora</th><th>Usuario</th><th>Acción</th><th>Detalle</th></tr>
+    </thead>
+    <tbody>
+      @for (r of registros(); track r.id) {
+        <tr>
+          <td class="sin-corte">{{ fecha(r.creado_en) }}</td>
+          <td>
+            {{ r.usuario_nombre }}
+            <span class="chip rol">{{ r.usuario_rol }}</span>
+          </td>
+          <td>{{ nombreAccion(r.accion) }}</td>
+          <td class="detalle">{{ describir(r) }}</td>
+        </tr>
+      } @empty {
+        @if (!cargando()) {
+          <tr><td colspan="4">No hay actividad para los filtros elegidos.</td></tr>
+        }
+      }
+    </tbody>
+  </table>
+</div>

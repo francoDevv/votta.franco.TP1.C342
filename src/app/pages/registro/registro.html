@@ -20,7 +20,18 @@
     </div>
     <div class="field">
       <label>Fecha de nacimiento</label>
-      <input type="date" formControlName="fechaNacimiento" />
+      <input
+        type="text"
+        inputmode="numeric"
+        autocomplete="bday"
+        placeholder="DD/MM/AAAA"
+        maxlength="10"
+        formControlName="fechaNacimiento"
+        (input)="formatearFecha($event)"
+      />
+      @if (errorFecha(); as mensaje) {
+        <p class="form-error">{{ mensaje }}</p>
+      }
     </div>
     <div class="field">
       <label>Tipo de sangre</label>

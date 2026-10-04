@@ -1,0 +1,47 @@
+.filtros {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.filtros__atajos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filtros__fechas,
+.filtros__selects {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0 16px;
+}
+
+.resultado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.tabla-scroll {
+  overflow-x: auto;
+}
+
+.sin-corte {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.rol {
+  margin-left: 6px;
+  font-size: 0.75rem;
+}
+
+.detalle {
+  color: var(--text-muted);
+  min-width: 260px;
+}

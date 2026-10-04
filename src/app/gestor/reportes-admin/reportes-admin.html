@@ -1,0 +1,178 @@
+<h1>Reportes</h1>
+
+<div class="pestanias" role="tablist">
+  <button type="button" role="tab" class="pestania" [class.pestania--activa]="pestania() === 'facturacion'"
+          [attr.aria-selected]="pestania() === 'facturacion'" (click)="pestania.set('facturacion')">
+    Facturación
+  </button>
+  <button type="button" role="tab" class="pestania" [class.pestania--activa]="pestania() === 'peliculas'"
+          [attr.aria-selected]="pestania() === 'peliculas'" (click)="pestania.set('peliculas')">
+    Películas más vistas
+  </button>
+  <button type="button" role="tab" class="pestania" [class.pestania--activa]="pestania() === 'candy'"
+          [attr.aria-selected]="pestania() === 'candy'" (click)="pestania.set('candy')">
+    Candy más vendido
+  </button>
+</div>
+
+@if (error()) {
+  <p class="form-error">{{ error() }}</p>
+}
+
+<!-- Rango de fechas: compartido por facturación y candy -->
+@if (pestania() !== 'peliculas') {
+  <div class="card rango">
+    <div class="rango__cabecera">
+      <span><span class="ticket-meta">Período:</span> <strong>{{ textoRango() }}</strong></span>
+      <div class="rango__atajos">
+        @for (a of atajos; track a.etiqueta) {
+          <button type="button" class="btn btn-ghost" (click)="aplicarAtajo(a)">{{ a.etiqueta }}</button>
+        }
+        <button type="button" class="btn btn-ghost" (click)="mostrarFechas.set(!mostrarFechas())">
+          {{ mostrarFechas() ? 'Ocultar fechas' : 'Elegir fechas' }}
+        </button>
+      </div>
+    </div>
+    @if (mostrarFechas()) {
+      <form class="rango__fechas" [formGroup]="rango">
+        <div class="field">
+          <label>Desde</label>
+          <app-selector-fecha formControlName="desde" />
+        </div>
+        <div class="field">
+          <label>Hasta</label>
+          <app-selector-fecha formControlName="hasta" />
+        </div>
+      </form>
+    }
+  </div>
+}
+
+@switch (pestania()) {
+  @case ('facturacion') {
+    <div class="resumen">
+      <div class="card dato">
+        <span class="ticket-meta">Cobrado</span>
+        <strong>{{ pesos(totales().cobrado) }}</strong>
+      </div>
+      <div class="card dato">
+        <span class="ticket-meta">Entradas vendidas</span>
+        <strong>{{ totales().entradas_vendidas }}</strong>
+      </div>
+      <div class="card dato">
+        <span class="ticket-meta">Compras</span>
+        <strong>{{ totales().compras }}</strong>
+      </div>
+      <div class="card dato">
+        <span class="ticket-meta">Pasado a crédito</span>
+        <strong class="dato--secundario">{{ pesos(totales().pasado_a_credito) }}</strong>
+      </div>
+    </div>
+
+    <div class="acciones">
+      <span class="ticket-meta">Facturación por día</span>
+      <div class="row">
+        <button type="button" class="btn btn-ghost" [disabled]="exportando() !== null || cargandoFacturacion()"
+                (click)="exportar('pdf')">
+          {{ exportando() === 'pdf' ? 'Generando…' : 'Exportar PDF' }}
+        </button>
+        <button type="button" class="btn btn-ghost" [disabled]="exportando() !== null || cargandoFacturacion()"
+                (click)="exportar('excel')">
+          {{ exportando() === 'excel' ? 'Generando…' : 'Exportar Excel' }}
+        </button>
+      </div>
+    </div>
+
+    @if (cargandoFacturacion()) {
+      <p>Cargando…</p>
+    } @else {
+      <div class="tabla-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Día</th><th class="num">Compras</th><th class="num">Entradas</th>
+              <th class="col-cobrado">Cobrado</th><th class="num">Pasado a crédito</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (f of filas(); track f.fecha) {
+              <tr [class.sin-ventas]="f.compras === 0">
+                <td class="sin-corte">{{ fechaFila(f.fecha) }}</td>
+                <td class="num">{{ f.compras }}</td>
+                <td class="num">{{ f.entradas_vendidas }}</td>
+                <td class="col-cobrado">
+                  <div class="cobrado">
+                    <div class="cobrado__pista"><div class="cobrado__barra" [style.width]="anchoBarra(f.cobrado)"></div></div>
+                    <span class="num">{{ pesos(f.cobrado) }}</span>
+                  </div>
+                </td>
+                <td class="num">{{ pesos(f.pasado_a_credito) }}</td>
+              </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr>
+              <th>Total</th>
+              <th class="num">{{ totales().compras }}</th>
+              <th class="num">{{ totales().entradas_vendidas }}</th>
+              <th class="num">{{ pesos(totales().cobrado) }}</th>
+              <th class="num">{{ pesos(totales().pasado_a_credito) }}</th>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <p class="ticket-meta nota">
+        Cobrado: dinero efectivamente ingresado, después de cupones y crédito. Incluye las compras canceladas,
+        porque su importe se devuelve como crédito y no en dinero.
+      </p>
+    }
+  }
+
+  @case ('peliculas') {
+    <div class="card">
+      <div class="ranking__cabecera">
+        <div class="row">
+          <button type="button" class="btn" [class.btn-primary]="periodo() === 'semana'"
+                  [class.btn-ghost]="periodo() !== 'semana'" (click)="cambiarPeriodo('semana')">Por semana</button>
+          <button type="button" class="btn" [class.btn-primary]="periodo() === 'mes'"
+                  [class.btn-ghost]="periodo() !== 'mes'" (click)="cambiarPeriodo('mes')">Por mes</button>
+        </div>
+        <div class="ranking__nav">
+          <button type="button" class="btn btn-ghost" (click)="moverPeriodo(-1)" aria-label="Período anterior">‹</button>
+          <strong>{{ textoPeriodo() }}</strong>
+          <button type="button" class="btn btn-ghost" (click)="moverPeriodo(1)" aria-label="Período siguiente">›</button>
+        </div>
+      </div>
+
+      @if (cargandoRanking()) {
+        <p>Cargando…</p>
+      } @else {
+        <app-grafico-barras [datos]="barrasPeliculas()" unidad="entradas"
+                            vacio="No hay entradas vendidas para funciones de este período." />
+      }
+      <p class="ticket-meta nota">Entradas vendidas y no canceladas de funciones del período.</p>
+    </div>
+  }
+
+  @case ('candy') {
+    @if (!cargandoProductos() && productos().length > 0) {
+      <div class="card destacado">
+        <span class="ticket-meta">Producto más vendido</span>
+        <strong>{{ productos()[0].producto }}</strong>
+        <span>{{ productos()[0].unidades }} unidades</span>
+      </div>
+    }
+    <div class="card">
+      <h3 style="margin-top: 0;">Top 5 del candy</h3>
+      @if (cargandoProductos()) {
+        <p>Cargando…</p>
+      } @else {
+        <app-grafico-barras [datos]="barrasProductos()" unidad="u."
+                            vacio="No hubo ventas de candy en este período." />
+      }
+      <p class="ticket-meta nota">
+        Unidades vendidas: incluye los productos que van dentro de los combos y los canjeados con puntos.
+      </p>
+    </div>
+  }
+}

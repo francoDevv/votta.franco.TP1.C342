@@ -1,0 +1,20 @@
+@if (datos().length === 0) {
+  <p class="ticket-meta">{{ vacio() }}</p>
+} @else {
+  <ol class="gb" role="list">
+    @for (d of datos(); track d.etiqueta; let i = $index) {
+      <li class="gb-fila">
+        <span class="gb-puesto">{{ i + 1 }}</span>
+        <div class="gb-cuerpo">
+          <div class="gb-etiquetas">
+            <span class="gb-nombre">{{ d.etiqueta }}</span>
+            <span class="gb-valor">{{ d.valor.toLocaleString('es-AR') }} {{ unidad() }}</span>
+          </div>
+          <div class="gb-pista">
+            <div class="gb-barra" [class.gb-barra--primera]="i === 0" [style.width]="ancho(d.valor)"></div>
+          </div>
+        </div>
+      </li>
+    }
+  </ol>
+}

@@ -1,0 +1,161 @@
+.pestanias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.pestania {
+  padding: 10px 16px;
+  font: inherit;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+}
+
+.pestania--activa {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+.rango {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.rango__cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.rango__atajos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.rango__fechas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0 16px;
+}
+
+.resumen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.dato {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dato strong {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  line-height: 1.1;
+  color: var(--highlight);
+}
+
+.dato strong.dato--secundario {
+  color: var(--text-muted);
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.tabla-scroll {
+  overflow-x: auto;
+}
+
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.sin-corte {
+  white-space: nowrap;
+}
+
+.sin-ventas td {
+  opacity: 0.45;
+}
+
+.col-cobrado {
+  min-width: 220px;
+  text-align: right;
+}
+
+.cobrado {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cobrado__pista {
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface-alt);
+  overflow: hidden;
+}
+
+.cobrado__barra {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.nota {
+  margin-top: 12px;
+  font-size: 0.85rem;
+}
+
+.ranking__cabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.ranking__nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.destacado {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px;
+  border-color: var(--highlight);
+}
+
+.destacado strong {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--highlight);
+}

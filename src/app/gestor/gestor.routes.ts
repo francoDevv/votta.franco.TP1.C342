@@ -55,6 +55,16 @@ export const GESTOR_ROUTES: Routes = [
         loadComponent: () => import('./cupon-form/cupon-form').then(m => m.CuponForm),
     },
     {
+        path: 'reportes',
+        canMatch: [rolGuard(['admin'])],
+        loadComponent: () => import('./reportes-admin/reportes-admin').then(m => m.ReportesAdmin),
+    },
+    {
+        path: 'actividad',
+        canMatch: [rolGuard(['admin'])],
+        loadComponent: () => import('./actividad-admin/actividad-admin').then(m => m.ActividadAdmin),
+    },
+    {
         path: 'recompensas',
         canMatch: [rolGuard(['admin'])],
         loadComponent: () => import('./recompensas-admin/recompensas-admin').then(m => m.RecompensasAdmin),

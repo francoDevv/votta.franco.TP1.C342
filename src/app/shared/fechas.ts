@@ -1,9 +1,3 @@
-/**
- * Utilidades de fechas en hora local.
- * Las fechas "solo día" se manejan como texto 'YYYY-MM-DD' para evitar
- * corrimientos de zona horaria al convertirlas a Date.
- */
-
 /** Días antes del estreno en que abre la venta (preventa). */
 export const DIAS_PREVENTA = 7;
 
@@ -46,4 +40,13 @@ export function fechaCorta(d: Date): string {
 /** Ej: jueves 15 de octubre de 2026 */
 export function fechaLarga(d: Date): string {
   return d.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+/** Fecha y hora en hora de Argentina. Ej: 04/10/2026 20:15 */
+export function fechaHoraAr(iso: string): string {
+  const d = new Date(iso);
+  const zona = 'America/Argentina/Buenos_Aires';
+  const fecha = d.toLocaleDateString('es-AR', { timeZone: zona, day: '2-digit', month: '2-digit', year: 'numeric' });
+  const hora = d.toLocaleTimeString('es-AR', { timeZone: zona, hour: '2-digit', minute: '2-digit', hour12: false });
+  return `${fecha} ${hora}`;
 }

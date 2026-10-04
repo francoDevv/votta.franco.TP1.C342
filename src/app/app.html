@@ -13,6 +13,8 @@
       @if (auth.rol() === 'admin') {
         <a routerLink="/gestor/precios" class="nav-link">Precios</a>
         <a routerLink="/gestor/recompensas" class="nav-link">Recompensas</a>
+        <a routerLink="/gestor/reportes" class="nav-link">Reportes</a>
+        <a routerLink="/gestor/actividad" class="nav-link">Actividad</a>
       }
     }
     @if (!auth.cargando() && (auth.rol() === 'empleado' || auth.rol() === 'admin')) {
