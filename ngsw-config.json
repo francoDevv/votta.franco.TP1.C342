@@ -26,7 +26,10 @@
         "https://vmxpxsokimlnewrjdcvz.supabase.co/rest/v1/generos*",
         "https://vmxpxsokimlnewrjdcvz.supabase.co/rest/v1/funciones*",
         "https://vmxpxsokimlnewrjdcvz.supabase.co/rest/v1/productos*",
-        "https://vmxpxsokimlnewrjdcvz.supabase.co/rest/v1/combos*"
+        "https://vmxpxsokimlnewrjdcvz.supabase.co/rest/v1/combos*",
+        "https://vmxpxsokimlnewrjdcvz.supabase.co/rest/v1/resenas*",
+        "https://vmxpxsokimlnewrjdcvz.supabase.co/rest/v1/promedio_resenas*",
+        "https://vmxpxsokimlnewrjdcvz.supabase.co/rest/v1/clientes_publicos*"
       ],
       "cacheConfig": {
         "strategy": "freshness",

@@ -3,6 +3,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { FuncionesService, Funcion } from '../../services/funciones.service';
 import { PeliculasService, Pelicula } from '../../services/peliculas.service';
+import { PwaService } from '../../services/pwa.service';
 import { DIAS_PREVENTA, desdeIso, fechaLarga, hoy, sumarDias } from '../../shared/fechas';
 
 @Component({
@@ -15,10 +16,12 @@ export class FuncionesPelicula implements OnInit {
   private funcionesService = inject(FuncionesService);
   private peliculasService = inject(PeliculasService);
   private route = inject(ActivatedRoute);
+  protected pwa = inject(PwaService);
 
   pelicula = signal<Pelicula | null>(null);
   funciones = signal<Funcion[]>([]);
   cargando = signal(true);
+  errorCarga = signal(false);
 
   /** Si la venta todavía no abrió, devuelve la fecha de apertura en texto; si no, null. */
   aperturaVenta = computed(() => {
@@ -39,12 +42,18 @@ export class FuncionesPelicula implements OnInit {
 
   async ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
-    const [pelicula, funciones] = await Promise.all([
-      this.peliculasService.obtenerPorId(id),
-      this.funcionesService.listarPorPelicula(id),
-    ]);
-    this.pelicula.set(pelicula);
-    this.funciones.set(funciones);
-    this.cargando.set(false);
+    try {
+      const [pelicula, funciones] = await Promise.all([
+        this.peliculasService.obtenerPorId(id),
+        this.funcionesService.listarPorPelicula(id),
+      ]);
+      this.pelicula.set(pelicula);
+      this.funciones.set(funciones);
+    } catch (e) {
+      console.error('Error al cargar las funciones', e);
+      this.errorCarga.set(true);
+    } finally {
+      this.cargando.set(false);
+    }
   }
 }

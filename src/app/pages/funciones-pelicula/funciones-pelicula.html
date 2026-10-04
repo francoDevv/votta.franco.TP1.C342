@@ -44,3 +44,15 @@
     </div>
   }
 }
+ @else if (errorCarga()) {
+  <div class="card" style="max-width: 520px;">
+    <p><strong>No pudimos cargar las funciones.</strong></p>
+    <p class="ticket-meta">
+      {{ pwa.online()
+        ? 'Hubo un problema al conectar con el servidor. Intentá de nuevo en unos minutos.'
+        : 'No tenés conexión y estas funciones todavía no se guardaron en tu dispositivo. Abrilas una vez con internet y después vas a poder verlas sin conexión.' }}
+    </p>
+  </div>
+} @else {
+  <p>Película no encontrada.</p>
+}

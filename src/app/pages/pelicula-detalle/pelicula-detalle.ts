@@ -3,6 +3,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { PeliculasService, Pelicula, Resena } from '../../services/peliculas.service';
 import { AuthService } from '../../services/auth.service';
+import { PwaService } from '../../services/pwa.service';
 
 @Component({
   selector: 'app-pelicula-detalle',
@@ -14,12 +15,17 @@ export class PeliculaDetalle implements OnInit {
   private peliculasService = inject(PeliculasService);
   private route = inject(ActivatedRoute);
   protected auth = inject(AuthService);
+  protected pwa = inject(PwaService);
 
   pelicula = signal<Pelicula | null>(null);
   resenas = signal<Resena[]>([]);
   promedio = signal<{ promedio: number; cantidad: number } | null>(null);
   miResena = signal<Resena | null>(null);
   cargando = signal(true);
+  /** No se pudo pedir la película (sin conexión o falla del servidor). */
+  errorCarga = signal(false);
+  /** La película se ve, pero no se pudieron traer las reseñas. */
+  resenasNoDisponibles = signal(false);
 
   estrellasNuevas = signal(5);
   comentarioNuevo = signal('');
@@ -33,31 +39,43 @@ export class PeliculaDetalle implements OnInit {
 
   async cargarTodo(id: number) {
     this.cargando.set(true);
-    try {
-      const [pelicula, resenas, promedio] = await Promise.all([
-        this.peliculasService.obtenerPorId(id),
-        this.peliculasService.listarResenas(id),
-        this.peliculasService.obtenerPromedio(id),
-      ]);
+    this.errorCarga.set(false);
+    this.resenasNoDisponibles.set(false);
 
-      this.pelicula.set(pelicula);
-      this.resenas.set(resenas);
-      this.promedio.set(promedio);
+    // Se piden juntas, pero cada una se evalúa por separado: si fallan las reseñas
+    // (por ejemplo, sin conexión) la película se muestra igual.
+    const [pelicula, resenas, promedio] = await Promise.allSettled([
+      this.peliculasService.obtenerPorId(id),
+      this.peliculasService.listarResenas(id),
+      this.peliculasService.obtenerPromedio(id),
+    ]);
 
-      if (pelicula && this.auth.rol() === 'cliente') {
+    if (pelicula.status === 'rejected') {
+      console.error('Error al cargar la película', pelicula.reason);
+      this.pelicula.set(null);
+      this.errorCarga.set(true);
+      this.cargando.set(false);
+      return;
+    }
+
+    this.pelicula.set(pelicula.value);
+    if (resenas.status === 'fulfilled') this.resenas.set(resenas.value);
+    else this.resenasNoDisponibles.set(true);
+    this.promedio.set(promedio.status === 'fulfilled' ? promedio.value : null);
+
+    if (pelicula.value && this.auth.rol() === 'cliente') {
+      try {
         const mia = await this.peliculasService.miResena(id, this.auth.usuario()!.id);
         this.miResena.set(mia);
         if (mia) {
           this.estrellasNuevas.set(mia.estrellas);
           this.comentarioNuevo.set(mia.comentario);
         }
+      } catch (e) {
+        console.warn('No se pudo cargar mi reseña', e);
       }
-    } catch (e) {
-      console.error('Error al cargar la pelicula', e);
-      this.pelicula.set(null);
-    } finally {
-      this.cargando.set(false);
     }
+    this.cargando.set(false);
   }
 
   async guardarResena() {

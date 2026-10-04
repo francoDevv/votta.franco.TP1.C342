@@ -37,7 +37,13 @@
         <p>{{ r.comentario }}</p>
       </article>
     } @empty {
-      <p>Todavía no hay reseñas para esta película.</p>
+      @if (resenasNoDisponibles()) {
+        <p class="ticket-meta">
+          {{ pwa.online() ? 'No se pudieron cargar las reseñas.' : 'Las reseñas no están disponibles sin conexión.' }}
+        </p>
+      } @else {
+        <p>Todavía no hay reseñas para esta película.</p>
+      }
     }
   </div>
 
@@ -66,6 +72,16 @@
       </form>
     </div>
   }
+} @else if (errorCarga()) {
+  <a routerLink="/cartelera" class="back-link">‹ Volver a la cartelera</a>
+  <div class="card" style="max-width: 520px;">
+    <p><strong>No pudimos cargar esta película.</strong></p>
+    <p class="ticket-meta">
+      {{ pwa.online()
+        ? 'Hubo un problema al conectar con el servidor. Intentá de nuevo en unos minutos.'
+        : 'No tenés conexión y esta película todavía no se guardó en tu dispositivo. Abrila una vez con internet y después vas a poder verla sin conexión.' }}
+    </p>
+  </div>
 } @else {
   <p>Película no encontrada.</p>
 }

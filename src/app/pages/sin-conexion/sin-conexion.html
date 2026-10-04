@@ -1,0 +1,15 @@
+<div class="card sin-conexion">
+  <h1>Sin conexión</h1>
+  <p>
+    Esta sección necesita internet. Mientras tanto, podés ver la cartelera y las películas que ya abriste.
+  </p>
+  <p class="ticket-meta">En cuanto vuelva la conexión, te llevamos de nuevo a donde estabas.</p>
+  <div class="row">
+    <a routerLink="/cartelera" class="btn btn-primary">Ir a la cartelera</a>
+    @if (hayDestino) {
+      <button type="button" class="btn btn-ghost" [disabled]="!pwa.online()" (click)="reintentar()">
+        Reintentar
+      </button>
+    }
+  </div>
+</div>

@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
 import { rolGuard } from './guards/rol.guard';
+import { conexionGuard } from './guards/conexion.guard';
 
 export const routes: Routes = [
   {
@@ -14,6 +15,7 @@ export const routes: Routes = [
   {
     path: 'perfil',
     canMatch: [authGuard],
+    canActivate: [conexionGuard],
     loadComponent: () => import('./pages/perfil/perfil').then(m => m.Perfil),
   },
   {
@@ -39,15 +41,18 @@ export const routes: Routes = [
   },
   {
     path: 'funciones/:id/butacas',
+    canActivate: [conexionGuard],
     loadComponent: () => import('./pages/seleccion-butacas/seleccion-butacas').then(m => m.SeleccionButacas),
   },
   {
     path: 'funciones/:id/candy',
+    canActivate: [conexionGuard],
     loadComponent: () => import('./pages/candy-seleccion/candy-seleccion').then(m => m.CandySeleccion),
   },
   {
     path: 'mis-entradas',
     canMatch: [authGuard],
+    canActivate: [conexionGuard],
     loadComponent: () => import('./pages/mis-entradas/mis-entradas').then(m => m.MisEntradas),
   },
   {
@@ -59,6 +64,10 @@ export const routes: Routes = [
     path: 'mis-peliculas',
     canMatch: [authGuard],
     loadComponent: () => import('./pages/mis-peliculas/mis-peliculas').then(m => m.MisPeliculas),
+  },
+  {
+    path: 'sin-conexion',
+    loadComponent: () => import('./pages/sin-conexion/sin-conexion').then(m => m.SinConexion),
   },
   { path: '', redirectTo: 'cartelera', pathMatch: 'full' },
 ];
