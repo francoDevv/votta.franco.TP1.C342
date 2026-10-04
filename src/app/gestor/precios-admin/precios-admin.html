@@ -1,0 +1,49 @@
+<div class="card" style="max-width: 560px;">
+  <h1>Precios de entradas</h1>
+  <p class="ticket-meta">
+    Se aplican a las compras nuevas. Las entradas ya vendidas conservan el precio con el que se compraron.
+  </p>
+
+  @if (cargando()) {
+    <p>Cargando…</p>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="guardar()">
+      <div class="row">
+        <div class="field">
+          <label>Precio base (normal y accesible)</label>
+          <input type="number" min="1" step="50" formControlName="precioBase" />
+        </div>
+        <div class="field">
+          <label>Recargo VIP (filas R, S y T)</label>
+          <input type="number" min="0" step="50" formControlName="recargoVip" />
+        </div>
+      </div>
+
+      <div class="vista-previa">
+        <div>
+          <span class="ticket-meta">Normal / Accesible</span>
+          <strong>{{ formatear(vistaPrevia().normal) }}</strong>
+        </div>
+        <div>
+          <span class="ticket-meta">VIP</span>
+          <strong>{{ formatear(vistaPrevia().vip) }}</strong>
+        </div>
+      </div>
+
+      @if (actual(); as a) {
+        <p class="ticket-meta">Última actualización: {{ a.actualizado_en | date: 'dd/MM/yyyy HH:mm' }}</p>
+      }
+
+      @if (error()) {
+        <p class="form-error">{{ error() }}</p>
+      }
+      @if (exito()) {
+        <p class="aviso-exito">{{ exito() }}</p>
+      }
+
+      <button type="submit" class="btn btn-primary" [disabled]="form.invalid || guardando()">
+        {{ guardando() ? 'Guardando…' : 'Guardar precios' }}
+      </button>
+    </form>
+  }
+</div>

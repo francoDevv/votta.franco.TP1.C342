@@ -8,6 +8,9 @@
       <a routerLink="/gestor/productos" class="nav-link">Candy</a>
       <a routerLink="/gestor/combos" class="nav-link">Combos</a>
       <a routerLink="/gestor/cupones" class="nav-link">Cupones</a>
+      @if (auth.rol() === 'admin') {
+        <a routerLink="/gestor/precios" class="nav-link">Precios</a>
+      }
     }
     @if (!auth.cargando() && (auth.rol() === 'empleado' || auth.rol() === 'admin')) {
       <a routerLink="/empleado" class="nav-link">Validar QR</a>

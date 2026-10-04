@@ -1,7 +1,7 @@
 import { Component, OnInit, computed, effect, inject, signal, untracked } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
-import { ButacasService, PRECIOS_BUTACA } from '../../services/butacas.service';
+import { ButacasService, PreciosFuncion } from '../../services/butacas.service';
 import { SalasService, Butaca } from '../../services/salas.service';
 import { FuncionesService, Funcion } from '../../services/funciones.service';
 import { CandyService, Producto, Combo } from '../../services/candy.service';
@@ -25,7 +25,7 @@ export class CandySeleccion implements OnInit {
   private comprasService = inject(ComprasService);
   protected auth = inject(AuthService);
 
-  protected preciosButaca = PRECIOS_BUTACA;
+  precios = signal<PreciosFuncion>({ normal: 0, accesible: 0, vip: 0 });
 
   funcion = signal<Funcion | null>(null);
   entradasSeleccionadas = signal<Butaca[]>([]);
@@ -56,7 +56,7 @@ export class CandySeleccion implements OnInit {
   requiereAviso = computed(() => this.restriccion() > 0 && this.auth.rol() !== 'cliente');
 
   totalButacas = computed(() =>
-    this.entradasSeleccionadas().reduce((suma, b) => suma + (PRECIOS_BUTACA[b.tipo] ?? 0), 0)
+    this.entradasSeleccionadas().reduce((suma, b) => suma + (this.precios()[b.tipo] ?? 0), 0)
   );
 
   productosSeleccionados = computed(() =>
@@ -115,16 +115,18 @@ export class CandySeleccion implements OnInit {
 
   async ngOnInit() {
     const funcionId = Number(this.route.snapshot.paramMap.get('id'));
-    const [funcion, misIds, productos, combos] = await Promise.all([
+    const [funcion, misIds, productos, combos, precios] = await Promise.all([
       this.funcionesService.obtenerPorId(funcionId),
       this.butacasService.misReservas(funcionId),
       this.candyService.listarProductos(true),
       this.candyService.listarCombos(true),
+      this.butacasService.precios(funcionId),
     ]);
 
     this.funcion.set(funcion);
     this.productos.set(productos);
     this.combos.set(combos);
+    this.precios.set(precios);
 
     if (funcion && misIds.length > 0) {
       const todas = await this.salasService.listarButacas(funcion.sala_id);

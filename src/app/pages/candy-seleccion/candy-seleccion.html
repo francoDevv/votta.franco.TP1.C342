@@ -30,7 +30,7 @@
     @for (b of entradasSeleccionadas(); track b.id) {
       <div class="row" style="justify-content: space-between;">
         <span>{{ b.fila }}{{ b.numero }} <span class="chip">{{ b.tipo }}</span></span>
-        <span>${{ preciosButaca[b.tipo] }}</span>
+        <span>${{ precios()[b.tipo] }}</span>
       </div>
     }
   </div>

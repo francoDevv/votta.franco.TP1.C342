@@ -8,6 +8,9 @@ export interface DisponibilidadButaca {
   estado: 'libre' | 'reservada' | 'ocupada';
 }
 
+/** Precio por tipo de butaca para una función: { normal, accesible, vip }. */
+export type PreciosFuncion = Record<string, number>;
+
 const KEY = 'cine_session_id';
 
 function nuevoSessionId(): string {
@@ -19,8 +22,6 @@ function nuevoSessionId(): string {
 function obtenerSessionId(): string {
   return sessionStorage.getItem(KEY) ?? nuevoSessionId();
 }
-
-export const PRECIOS_BUTACA: Record<string, number> = { normal: 3500, accesible: 3500, vip: 5200 };
 
 @Injectable({ providedIn: 'root' })
 export class ButacasService {
@@ -50,6 +51,18 @@ export class ButacasService {
       }
       this.ultimaIdentidad = identidadActual;
     });
+  }
+
+  /** Precios vigentes de la función, calculados en el servidor. */
+  async precios(funcionId: number): Promise<PreciosFuncion> {
+    const { data, error } = await this.supabase.rpc('precios_funcion', { p_funcion_id: funcionId });
+    if (error) throw error;
+    const p = data as Record<string, number | string>;
+    return {
+      normal: Number(p['normal']),
+      accesible: Number(p['accesible']),
+      vip: Number(p['vip']),
+    };
   }
 
   async disponibilidad(funcionId: number): Promise<DisponibilidadButaca[]> {

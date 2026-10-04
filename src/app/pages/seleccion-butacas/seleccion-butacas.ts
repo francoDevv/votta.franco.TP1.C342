@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { RealtimeChannel } from '@supabase/supabase-js';
-import { ButacasService, PRECIOS_BUTACA } from '../../services/butacas.service';
+import { ButacasService, PreciosFuncion } from '../../services/butacas.service';
 import { SalasService, Butaca } from '../../services/salas.service';
 import { FuncionesService, Funcion } from '../../services/funciones.service';
 
@@ -23,6 +23,7 @@ export class SeleccionButacas implements OnInit, OnDestroy {
 
   funcion = signal<Funcion | null>(null);
   butacas = signal<Butaca[]>([]);
+  precios = signal<PreciosFuncion>({ normal: 0, accesible: 0, vip: 0 });
   disponibilidad = signal<Map<number, string>>(new Map());
   misButacas = signal<Set<number>>(new Set());
   cargando = signal(true);
@@ -45,7 +46,9 @@ export class SeleccionButacas implements OnInit, OnDestroy {
   });
 
   seleccionActual = computed(() => this.butacas().filter((b) => this.misButacas().has(b.id)));
-  total = computed(() => this.seleccionActual().reduce((suma, b) => suma + (PRECIOS_BUTACA[b.tipo] ?? 0), 0));
+  total = computed(() =>
+    this.seleccionActual().reduce((suma, b) => suma + (this.precios()[b.tipo] ?? 0), 0)
+  );
 
   async ngOnInit() {
     this.funcionId = Number(this.route.snapshot.paramMap.get('id'));
@@ -53,7 +56,12 @@ export class SeleccionButacas implements OnInit, OnDestroy {
     this.funcion.set(funcion);
 
     if (funcion) {
-      this.butacas.set(await this.salasService.listarButacas(funcion.sala_id));
+      const [butacas, precios] = await Promise.all([
+        this.salasService.listarButacas(funcion.sala_id),
+        this.butacasService.precios(this.funcionId),
+      ]);
+      this.butacas.set(butacas);
+      this.precios.set(precios);
       await this.actualizarDisponibilidad();
       const misIds = await this.butacasService.misReservas(this.funcionId);
       this.misButacas.set(new Set(misIds));

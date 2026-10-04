@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { rolGuard } from '../guards/rol.guard';
 
 export const GESTOR_ROUTES: Routes = [
     {
@@ -52,5 +53,10 @@ export const GESTOR_ROUTES: Routes = [
     {
         path: 'cupones/:id',
         loadComponent: () => import('./cupon-form/cupon-form').then(m => m.CuponForm),
+    },
+    {
+        path: 'precios',
+        canMatch: [rolGuard(['admin'])],
+        loadComponent: () => import('./precios-admin/precios-admin').then(m => m.PreciosAdmin),
     },
 ];

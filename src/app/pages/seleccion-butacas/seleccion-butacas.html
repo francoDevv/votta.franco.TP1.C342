@@ -7,9 +7,9 @@
   <p class="ticket-meta">{{ f.salas.nombre }} · {{ f.inicio | date: 'dd/MM/yyyy · HH:mm' }} · {{ f.formato }} · {{ f.idioma }}</p>
 
   <div class="row" style="margin: 16px 0;">
-    <span class="row"><span class="seat seat-static seat-libre">A1</span> Libre</span>
-    <span class="row"><span class="seat seat-static seat-accesible">JK</span> Accesible</span>
-    <span class="row"><span class="seat seat-static seat-vip">R1</span> VIP</span>
+    <span class="row"><span class="seat seat-static seat-libre">A1</span> Libre · ${{ precios()['normal'] }}</span>
+    <span class="row"><span class="seat seat-static seat-accesible">JK</span> Accesible · ${{ precios()['accesible'] }}</span>
+    <span class="row"><span class="seat seat-static seat-vip">R1</span> VIP · ${{ precios()['vip'] }}</span>
     <span class="row"><span class="seat seat-static seat-seleccionada">✓</span> Tu selección</span>
     <span class="row"><span class="seat seat-static seat-ocupada">×</span> No disponible</span>
   </div>
@@ -51,7 +51,7 @@
       </div>
       <button class="btn btn-primary" style="margin-top: 12px;" (click)="continuar()">
         Continuar con la compra
-    </button>
+      </button>
     }
   </div>
 }
