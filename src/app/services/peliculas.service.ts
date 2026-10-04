@@ -41,6 +41,17 @@ export interface Resena {
   clientes: { nombre: string; apellido: string };
 }
 
+/** Película vista por el cliente (con al menos una entrada validada). */
+export interface PeliculaVista {
+  pelicula_id: number;
+  nombre: string;
+  imagen_url: string | null;
+  ultima_vez: string;
+  veces: number;
+  estrellas: number | null;
+  comentario: string | null;
+}
+
 /** Columnas comunes a todas las consultas que devuelven Pelicula. */
 const SELECT_PELICULA = `
   id, nombre, sinopsis, duracion_minutos, imagen_url,
@@ -163,6 +174,13 @@ export class PeliculasService {
   async eliminar(id: number): Promise<void> {
     const { error } = await this.supabase.from('peliculas').delete().eq('id', id);
     if (error) throw error;
+  }
+
+  /** Historial de "Mis películas" del cliente logueado. */
+  async misPeliculas(): Promise<PeliculaVista[]> {
+    const { data, error } = await this.supabase.rpc('mis_peliculas');
+    if (error) throw error;
+    return ((data ?? []) as any[]).map((p) => ({ ...p, veces: Number(p.veces) }));
   }
 
   // Reseñas

@@ -1,0 +1,55 @@
+<h1>Mis películas</h1>
+<p class="ticket-meta" style="margin-bottom: 20px;">
+  Todo lo que viste en el cine. Una película aparece acá cuando escaneamos tu entrada en el ingreso.
+</p>
+
+@if (error()) {
+  <p class="form-error">{{ error() }}</p>
+}
+
+@if (cargando()) {
+  <p>Cargando…</p>
+} @else if (peliculas().length === 0) {
+  <div class="card" style="max-width: 480px;">
+    <p>Todavía no viste ninguna película con nosotros.</p>
+    <a routerLink="/cartelera" class="btn btn-primary">Ver cartelera</a>
+  </div>
+} @else {
+  <div class="grid-cards">
+    @for (p of peliculas(); track p.pelicula_id) {
+      <article class="ticket-card vista">
+        <a [routerLink]="['/peliculas', p.pelicula_id]" style="color: inherit;">
+          <div class="ticket-poster">
+            @if (urlImagen(p.imagen_url); as url) {
+              <img [src]="url" [alt]="p.nombre" />
+            } @else {
+              <span>Sin imagen</span>
+            }
+          </div>
+          <div class="ticket-body">
+            <p class="ticket-title">{{ p.nombre }}</p>
+            <p class="ticket-meta">
+              Vista el {{ p.ultima_vez | date: 'dd/MM/yyyy' }}
+              @if (p.veces > 1) {
+                · {{ p.veces }} veces
+              }
+            </p>
+          </div>
+        </a>
+        <div class="ticket-perforation"></div>
+        <div class="ticket-footer vista__calificacion">
+          @if (p.estrellas) {
+            <span class="vista__estrellas" [attr.aria-label]="p.estrellas + ' de 5 estrellas'">
+              {{ estrellas(p.estrellas) }}
+            </span>
+            @if (p.comentario) {
+              <span class="vista__comentario">“{{ p.comentario }}”</span>
+            }
+          } @else {
+            <a [routerLink]="['/peliculas', p.pelicula_id]" class="btn btn-ghost">Calificar</a>
+          }
+        </div>
+      </article>
+    }
+  </div>
+}

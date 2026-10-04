@@ -55,5 +55,10 @@ export const routes: Routes = [
     canMatch: [rolGuard(['empleado', 'admin'])],
     loadComponent: () => import('./pages/validacion/validacion').then(m => m.Validacion),
   },
+  {
+    path: 'mis-peliculas',
+    canMatch: [authGuard],
+    loadComponent: () => import('./pages/mis-peliculas/mis-peliculas').then(m => m.MisPeliculas),
+  },
   { path: '', redirectTo: 'cartelera', pathMatch: 'full' },
 ];
