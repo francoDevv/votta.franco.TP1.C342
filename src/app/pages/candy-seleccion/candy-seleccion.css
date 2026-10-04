@@ -35,3 +35,43 @@
   width: 18px;
   height: 18px;
 }
+.canjes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-alt);
+}
+
+.canje-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.canje-item > div:first-child {
+  display: flex;
+  flex-direction: column;
+}
+
+.linea-canje {
+  color: var(--info);
+}
+
+.usar-credito {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.usar-credito input {
+  width: 18px;
+  height: 18px;
+}

@@ -21,6 +21,9 @@ export interface DetalleCompra {
   subtotal: number;
   descuento: number;
   cupon_nombre: string | null;
+  credito_usado?: number;
+  puntos_canjeados?: number;
+  puntos_ganados?: number;
   total: number;
 }
 
@@ -36,6 +39,7 @@ export class ComprasService {
     mailContacto: string;
     creditoAUsar?: number;
     aceptaRestriccion?: boolean;
+    recompensaIds?: number[];
   }): Promise<DetalleCompra> {
     const { data, error } = await this.supabase.rpc('confirmar_compra', {
       p_funcion_id: datos.funcionId,
@@ -47,6 +51,7 @@ export class ComprasService {
       p_mail_contacto: datos.mailContacto || null,
       p_credito_a_usar: datos.creditoAUsar ?? 0,
       p_acepta_restriccion: datos.aceptaRestriccion ?? false,
+      p_recompensa_ids: datos.recompensaIds ?? [],
     });
     if (error) throw error;
     return data as DetalleCompra;

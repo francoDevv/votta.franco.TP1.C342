@@ -12,6 +12,7 @@
       <a routerLink="/gestor/cupones" class="nav-link">Cupones</a>
       @if (auth.rol() === 'admin') {
         <a routerLink="/gestor/precios" class="nav-link">Precios</a>
+        <a routerLink="/gestor/recompensas" class="nav-link">Recompensas</a>
       }
     }
     @if (!auth.cargando() && (auth.rol() === 'empleado' || auth.rol() === 'admin')) {

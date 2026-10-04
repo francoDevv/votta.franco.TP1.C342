@@ -8,6 +8,8 @@ import { CandyService, Producto, Combo } from '../../services/candy.service';
 import { CuponesService, CuponAplicable } from '../../services/cupones.service';
 import { ComprasService, DetalleCompra } from '../../services/compras.service';
 import { AuthService } from '../../services/auth.service';
+import { EntradasService } from '../../services/entradas.service';
+import { PuntosService, Recompensa } from '../../services/puntos.service';
 
 @Component({
   selector: 'app-candy-seleccion',
@@ -23,6 +25,8 @@ export class CandySeleccion implements OnInit {
   private candyService = inject(CandyService);
   private cuponesService = inject(CuponesService);
   private comprasService = inject(ComprasService);
+  private entradasService = inject(EntradasService);
+  private puntosService = inject(PuntosService);
   protected auth = inject(AuthService);
 
   precios = signal<PreciosFuncion>(PRECIOS_VACIOS);
@@ -35,6 +39,13 @@ export class CandySeleccion implements OnInit {
 
   cupon = signal<CuponAplicable | null>(null);
   porcentajeBienvenida = signal<number | null>(null);
+
+  // Datos del cliente registrado: puntos, recompensas y crédito
+  puntosDisponibles = signal(0);
+  recompensas = signal<Recompensa[]>([]);
+  creditoDisponible = signal(0);
+  usarCredito = signal(false);
+  private cantidadCanjes = signal<Map<number, number>>(new Map());
 
   mailContacto = signal('');
   aceptaRestriccion = signal(false);
@@ -76,14 +87,56 @@ export class CandySeleccion implements OnInit {
     this.combosSeleccionados().reduce((s, x) => s + x.combo.precio * x.cantidad, 0)
   );
 
-  totalGeneral = computed(() => this.totalButacas() + this.totalCandy());
+  // ---------- Canjes con puntos ----------
+  canjesSeleccionados = computed(() =>
+    this.recompensas()
+      .filter((r) => this.cantidadCanjes().has(r.id))
+      .map((r) => ({ recompensa: r, cantidad: this.cantidadCanjes().get(r.id)! }))
+  );
+
+  puntosACanjear = computed(() =>
+    this.canjesSeleccionados().reduce((s, c) => s + c.recompensa.costo_puntos * c.cantidad, 0)
+  );
+
+  puntosRestantes = computed(() => this.puntosDisponibles() - this.puntosACanjear());
+
+  entradasGratis = computed(() =>
+    this.canjesSeleccionados()
+      .filter((c) => c.recompensa.tipo === 'entrada')
+      .reduce((s, c) => s + c.cantidad, 0)
+  );
+
+  /** Igual que en el servidor: las entradas gratis se aplican sobre las butacas más baratas. */
+  descuentoEntradasGratis = computed(() => {
+    const preciosOrdenados = this.entradasSeleccionadas()
+      .map((b) => this.precios()[b.tipo] ?? 0)
+      .sort((a, b) => a - b);
+    return preciosOrdenados.slice(0, this.entradasGratis()).reduce((s, p) => s + p, 0);
+  });
+
+  productosCanjeados = computed(() =>
+    this.canjesSeleccionados().filter((c) => c.recompensa.tipo === 'producto')
+  );
+
+  // ---------- Totales (mismo orden que el servidor) ----------
+  // precio → canjes → cupón → crédito → pago restante
+  totalGeneral = computed(() => this.totalButacas() - this.descuentoEntradasGratis() + this.totalCandy());
 
   descuento = computed(() => {
     const c = this.cupon();
     return c ? Math.round((this.totalGeneral() * c.porcentaje) / 100) : 0;
   });
 
-  totalFinal = computed(() => this.totalGeneral() - this.descuento());
+  creditoAplicado = computed(() =>
+    this.usarCredito()
+      ? Math.max(0, Math.min(this.creditoDisponible(), this.totalGeneral() - this.descuento()))
+      : 0
+  );
+
+  totalFinal = computed(() => this.totalGeneral() - this.descuento() - this.creditoAplicado());
+
+  /** 1 punto por cada peso efectivamente pagado (solo clientes registrados). */
+  puntosAGanar = computed(() => (this.auth.rol() === 'cliente' ? Math.floor(this.totalFinal()) : 0));
 
   puedeConfirmar = computed(() => {
     if (this.entradasSeleccionadas().length === 0) return false;
@@ -96,7 +149,10 @@ export class CandySeleccion implements OnInit {
     effect(() => {
       if (this.auth.cargando()) return;
       const rol = this.auth.rol();
-      untracked(() => this.cargarCupon(rol));
+      untracked(() => {
+        this.cargarCupon(rol);
+        this.cargarDatosCliente(rol);
+      });
     });
   }
 
@@ -110,6 +166,30 @@ export class CandySeleccion implements OnInit {
       }
     } catch (e) {
       console.error('No se pudo cargar el cupón', e);
+    }
+  }
+
+  /** Puntos, recompensas canjeables y crédito: solo para clientes registrados. */
+  private async cargarDatosCliente(rol: string) {
+    if (rol !== 'cliente') {
+      this.puntosDisponibles.set(0);
+      this.recompensas.set([]);
+      this.creditoDisponible.set(0);
+      this.cantidadCanjes.set(new Map());
+      this.usarCredito.set(false);
+      return;
+    }
+    try {
+      const [puntos, recompensas, credito] = await Promise.all([
+        this.puntosService.misPuntos(),
+        this.puntosService.listarRecompensas(),
+        this.entradasService.creditoDisponible(this.auth.usuario()!.id),
+      ]);
+      this.puntosDisponibles.set(puntos);
+      this.recompensas.set(recompensas);
+      this.creditoDisponible.set(credito);
+    } catch (e) {
+      console.error('No se pudieron cargar los puntos y el crédito', e);
     }
   }
 
@@ -165,6 +245,27 @@ export class CandySeleccion implements OnInit {
     });
   }
 
+  cantidadCanje(id: number): number {
+    return this.cantidadCanjes().get(id) ?? 0;
+  }
+
+  /** Se puede sumar si alcanzan los puntos y no hay más entradas gratis que butacas. */
+  puedeSumarCanje(r: Recompensa): boolean {
+    if (this.puntosRestantes() < r.costo_puntos) return false;
+    if (r.tipo === 'entrada' && this.entradasGratis() >= this.entradasSeleccionadas().length) return false;
+    return true;
+  }
+
+  cambiarCantidadCanje(r: Recompensa, delta: number) {
+    if (delta > 0 && !this.puedeSumarCanje(r)) return;
+    this.cantidadCanjes.update((mapa) => {
+      const nuevo = new Map(mapa);
+      const siguiente = Math.max(0, (nuevo.get(r.id) ?? 0) + delta);
+      siguiente === 0 ? nuevo.delete(r.id) : nuevo.set(r.id, siguiente);
+      return nuevo;
+    });
+  }
+
   async confirmarCompra() {
     const funcion = this.funcion();
     if (!funcion || !this.puedeConfirmar()) return;
@@ -178,7 +279,10 @@ export class CandySeleccion implements OnInit {
         productos: this.productosSeleccionados().map((p) => ({ productoId: p.producto.id, cantidad: p.cantidad })),
         combos: this.combosSeleccionados().map((c) => ({ comboId: c.combo.id, cantidad: c.cantidad })),
         mailContacto: this.mailContacto(),
-        creditoAUsar: 0,
+        creditoAUsar: this.creditoAplicado(),
+        recompensaIds: this.canjesSeleccionados().flatMap((c) =>
+          Array<number>(c.cantidad).fill(c.recompensa.id)
+        ),
         aceptaRestriccion: this.requiereAviso() && this.aceptaRestriccion(),
       });
       this.detalleCompra.set(detalle);

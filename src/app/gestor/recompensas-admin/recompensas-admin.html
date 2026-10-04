@@ -1,0 +1,98 @@
+<h1>Recompensas</h1>
+<p class="ticket-meta" style="margin-bottom: 20px;">
+  Los clientes registrados suman 1 punto por cada peso pagado y los canjean al comprar.
+</p>
+
+<div class="card" style="max-width: 560px; margin-bottom: 24px;">
+  <h3 style="margin-top: 0;">{{ editandoId() ? 'Editar recompensa' : 'Nueva recompensa' }}</h3>
+
+  <form [formGroup]="form" (ngSubmit)="guardar()">
+    <div class="field">
+      <label>Tipo</label>
+      <div class="row">
+        <label class="chip">
+          <input type="radio" formControlName="tipo" value="entrada" /> Entrada gratis
+        </label>
+        <label class="chip">
+          <input type="radio" formControlName="tipo" value="producto" /> Producto del candy
+        </label>
+      </div>
+    </div>
+
+    @if (tipo() === 'producto') {
+      <div class="field">
+        <label>Producto</label>
+        <select formControlName="productoId" (change)="productoElegido()">
+          <option [ngValue]="null" disabled>Elegí un producto</option>
+          @for (p of productos(); track p.id) {
+            <option [ngValue]="p.id">{{ p.nombre }} (${{ p.precio }})</option>
+          }
+        </select>
+      </div>
+    }
+
+    <div class="row">
+      <div class="field" style="flex: 2;">
+        <label>Nombre</label>
+        <input type="text" formControlName="nombre" placeholder="Ej: Pochoclo grande" />
+      </div>
+      <div class="field" style="flex: 1;">
+        <label>Costo en puntos</label>
+        <input type="number" min="1" step="10" formControlName="costoPuntos" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label>
+        <input type="checkbox" formControlName="activa" />
+        Disponible para canjear
+      </label>
+    </div>
+
+    @if (error()) {
+      <p class="form-error">{{ error() }}</p>
+    }
+    @if (exito()) {
+      <p class="aviso-exito">{{ exito() }}</p>
+    }
+
+    <div class="row">
+      <button type="submit" class="btn btn-primary" [disabled]="form.invalid || guardando()">
+        {{ guardando() ? 'Guardando…' : editandoId() ? 'Guardar cambios' : 'Crear recompensa' }}
+      </button>
+      @if (editandoId()) {
+        <button type="button" class="btn btn-ghost" (click)="cancelarEdicion()">Cancelar</button>
+      }
+    </div>
+  </form>
+</div>
+
+@if (cargando()) {
+  <p>Cargando…</p>
+} @else {
+  <table>
+    <thead>
+      <tr><th>Recompensa</th><th>Tipo</th><th>Costo</th><th>Estado</th><th></th></tr>
+    </thead>
+    <tbody>
+      @for (r of recompensas(); track r.id) {
+        <tr [class.inactiva]="!r.activa">
+          <td>{{ r.nombre }}</td>
+          <td>{{ r.tipo === 'entrada' ? 'Entrada gratis' : 'Candy: ' + r.productos?.nombre }}</td>
+          <td>{{ r.costo_puntos }} pts</td>
+          <td>{{ r.activa ? 'Activa' : 'Inactiva' }}</td>
+          <td>
+            <div class="row">
+              <button type="button" class="btn btn-ghost" (click)="editar(r)">Editar</button>
+              <button type="button" class="btn btn-ghost" (click)="alternarActiva(r)">
+                {{ r.activa ? 'Desactivar' : 'Activar' }}
+              </button>
+            </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr><td colspan="5">Todavía no hay recompensas configuradas.</td></tr>
+      }
+    </tbody>
+  </table>
+}

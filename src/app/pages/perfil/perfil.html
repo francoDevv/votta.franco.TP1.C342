@@ -1,19 +1,65 @@
-<div class="card" style="max-width: 420px;">
-  <h1>Mi perfil</h1>
-  <p>Mail: {{ auth.usuario()?.email }}</p>
-  <p class="chip">Rol: <b>{{ auth.rol() }}</b></p>
+<div class="perfil">
+  <div class="card perfil__datos">
+    <h1>Mi perfil</h1>
+    <p>Mail: {{ auth.usuario()?.email }}</p>
+    <p class="chip">Rol: <b>{{ auth.rol() }}</b></p>
 
-  @if (auth.rol() === 'cliente') {
-    @if (cargandoDatos()) {
-      <p>Cargando datos…</p>
-    } @else if (datosCliente(); as d) {
-      <p>Nombre: {{ d.nombre }} {{ d.apellido }}</p>
-      <p>Fecha de nacimiento: {{ d.fecha_nacimiento }}</p>
-      <p>Tipo de sangre: {{ d.tipo_sangre }}</p>
-      <p>Color de ojos: {{ d.color_ojos }}</p>
-      <p>Días de vacaciones por año: {{ d.dias_vacaciones }}</p>
+    @if (auth.rol() === 'cliente') {
+      @if (cargandoDatos()) {
+        <p>Cargando datos…</p>
+      } @else if (datosCliente(); as d) {
+        <p>Nombre: {{ d.nombre }} {{ d.apellido }}</p>
+        <p>Fecha de nacimiento: {{ d.fecha_nacimiento }}</p>
+        <p>Tipo de sangre: {{ d.tipo_sangre }}</p>
+        <p>Color de ojos: {{ d.color_ojos }}</p>
+        <p>Días de vacaciones por año: {{ d.dias_vacaciones }}</p>
+      }
     }
-  }
 
-  <button class="btn btn-ghost" (click)="salir()">Cerrar sesión</button>
+    <button class="btn btn-ghost" (click)="salir()">Cerrar sesión</button>
+  </div>
+
+  @if (auth.rol() === 'cliente' && !cargandoDatos()) {
+    <div class="perfil__saldos">
+      <div class="card saldo">
+        <span class="ticket-meta">Puntos acumulados</span>
+        <strong>{{ formatear(puntos()) }}</strong>
+        <span class="ticket-meta">1 punto por cada peso pagado. Se canjean al comprar.</span>
+      </div>
+      <div class="card saldo">
+        <span class="ticket-meta">Crédito disponible</span>
+        <strong>${{ formatear(credito()) }}</strong>
+        <span class="ticket-meta">Por compras canceladas. Se usa al pagar.</span>
+      </div>
+    </div>
+
+    <div class="card perfil__canjes">
+      <h2>Historial de canjes</h2>
+      @if (canjes().length === 0) {
+        <p class="ticket-meta">
+          Todavía no canjeaste puntos. Podés hacerlo en el paso de pago de tu próxima compra.
+        </p>
+      } @else {
+        <div class="tabla-scroll">
+          <table>
+            <thead>
+              <tr><th>Fecha</th><th>Recompensa</th><th>Película</th><th>Puntos</th><th>Estado</th></tr>
+            </thead>
+            <tbody>
+              @for (c of canjes(); track $index) {
+                <tr [class.devuelto]="c.estado_compra === 'cancelada'">
+                  <td>{{ c.fecha | date: 'dd/MM/yyyy' }}</td>
+                  <td>{{ c.recompensa }}</td>
+                  <td>{{ c.pelicula ?? '—' }}</td>
+                  <td>{{ c.puntos }}</td>
+                  <td>{{ c.estado_compra === 'cancelada' ? 'Devuelto (compra cancelada)' : 'Canjeado' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+      <a routerLink="/mis-entradas" class="btn btn-ghost">Ver mis entradas</a>
+    </div>
+  }
 </div>

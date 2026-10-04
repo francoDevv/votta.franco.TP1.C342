@@ -1,0 +1,9 @@
+.aviso-exito {
+  margin: 0 0 12px;
+  font-weight: 700;
+  color: var(--info);
+}
+
+tr.inactiva td {
+  opacity: 0.55;
+}

@@ -1,0 +1,41 @@
+.perfil {
+  display: grid;
+  gap: 20px;
+  max-width: 760px;
+}
+
+.perfil__datos {
+  max-width: 420px;
+}
+
+.perfil__saldos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.saldo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.saldo strong {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--highlight);
+}
+
+.perfil__canjes h2 {
+  margin-top: 0;
+}
+
+.tabla-scroll {
+  overflow-x: auto;
+  margin-bottom: 14px;
+}
+
+tr.devuelto td {
+  opacity: 0.55;
+}

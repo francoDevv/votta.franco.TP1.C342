@@ -12,6 +12,9 @@
     <p class="ticket-meta">Te enviamos los datos a {{ d.mail_contacto }}</p>
     <p style="margin: 16px 0;">{{ d.pelicula }} · {{ d.sala }} · {{ d.inicio | date: 'dd/MM/yyyy HH:mm' }}</p>
     <p><strong>Total pagado: ${{ d.total }}</strong></p>
+    @if (d.puntos_ganados) {
+      <p class="chip" style="display: inline-block; margin-top: 8px;">Sumaste <b>{{ d.puntos_ganados }}</b> puntos</p>
+    }
     <button class="btn btn-primary" (click)="descargarPdf()" [disabled]="descargandoPdf()" style="margin-top: 16px;">
       Descargar entrada (PDF)
     </button>
@@ -93,20 +96,82 @@
       </div>
     }
 
+    @if (recompensas().length > 0) {
+      <div class="canjes">
+        <div class="row" style="justify-content: space-between;">
+          <strong>Canjear puntos</strong>
+          <span class="chip">Te quedan <b>{{ puntosRestantes() }}</b> pts</span>
+        </div>
+        @for (r of recompensas(); track r.id) {
+          <div class="canje-item">
+            <div>
+              <span>{{ r.nombre }}</span>
+              <span class="ticket-meta">{{ r.costo_puntos }} pts</span>
+            </div>
+            <div class="row">
+              <button
+                type="button"
+                class="btn btn-ghost"
+                [disabled]="cantidadCanje(r.id) === 0"
+                (click)="cambiarCantidadCanje(r, -1)"
+              >−</button>
+              <strong>{{ cantidadCanje(r.id) }}</strong>
+              <button
+                type="button"
+                class="btn btn-ghost"
+                [disabled]="!puedeSumarCanje(r)"
+                (click)="cambiarCantidadCanje(r, 1)"
+              >+</button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
     <div class="row" style="justify-content: space-between;">
       <span>Entradas</span><span>${{ totalButacas() }}</span>
     </div>
+    @if (descuentoEntradasGratis() > 0) {
+      <div class="row linea-canje" style="justify-content: space-between;">
+        <span>Entradas canjeadas ({{ entradasGratis() }})</span><span>−${{ descuentoEntradasGratis() }}</span>
+      </div>
+    }
     <div class="row" style="justify-content: space-between;">
       <span>Candy</span><span>${{ totalCandy() }}</span>
     </div>
+    @for (c of productosCanjeados(); track c.recompensa.id) {
+      <div class="row linea-canje" style="justify-content: space-between;">
+        <span>{{ c.cantidad }}× {{ c.recompensa.productos?.nombre }} (canje)</span><span>sin cargo</span>
+      </div>
+    }
     @if (descuento() > 0) {
       <div class="row" style="justify-content: space-between; color: var(--highlight);">
         <span>Descuento ({{ cupon()!.porcentaje }}%)</span><span>−${{ descuento() }}</span>
       </div>
     }
+
+    @if (creditoDisponible() > 0) {
+      <label class="usar-credito">
+        <input
+          type="checkbox"
+          [checked]="usarCredito()"
+          (change)="usarCredito.set($any($event.target).checked)"
+        />
+        <span>Usar mi crédito (tenés ${{ creditoDisponible() }})</span>
+      </label>
+      @if (creditoAplicado() > 0) {
+        <div class="row linea-canje" style="justify-content: space-between;">
+          <span>Crédito aplicado</span><span>−${{ creditoAplicado() }}</span>
+        </div>
+      }
+    }
+
     <div class="row" style="justify-content: space-between; font-size: 18px; margin-top: 8px;">
       <strong>Total</strong><strong>${{ totalFinal() }}</strong>
     </div>
+    @if (puntosAGanar() > 0) {
+      <p class="ticket-meta" style="margin: 4px 0 0;">Con esta compra sumás {{ puntosAGanar() }} puntos.</p>
+    }
 
     @if (!auth.logueado()) {
       <div class="field" style="margin-top: 14px;">
