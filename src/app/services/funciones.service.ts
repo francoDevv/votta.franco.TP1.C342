@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { SupabaseService } from './supabase.service';
+import { aIso, hoy, sumarDias } from '../shared/fechas';
 
 export type Formato = '2D' | '3D' | '4D' | '5D';
 export type Idioma = 'castellano' | 'subtitulada';
@@ -68,15 +69,16 @@ export class FuncionesService {
     if (error) throw error;
   }
 
-  async listarPorPelicula(peliculaId: number): Promise<Funcion[]> {
+   async listarPorPelicula(peliculaId: number): Promise<Funcion[]> {
     const { data, error } = await this.supabase
       .from('funciones')
       .select(SELECT_FUNCION)
       .eq('pelicula_id', peliculaId)
-      .gte('inicio', new Date().toISOString())
+      .gte('inicio', aIso(sumarDias(hoy(), -1)))
       .order('inicio');
     if (error) throw error;
-    return (data ?? []) as any;
+    const ahora = Date.now();
+    return ((data ?? []) as any[]).filter((f) => new Date(f.inicio).getTime() >= ahora);
   }
 
   async obtenerPorId(id: number): Promise<Funcion | null> {
