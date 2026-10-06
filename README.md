@@ -134,13 +134,7 @@ Estilo propio con tema oscuro y estética de ticket de cine (tarjetas con perfor
 
 | Rol | Usuario | Contraseña |
 |---|---|---|
-| Cliente | _completar_ | _completar_ |
-| Empleado | _completar_ | _completar_ |
-| Gestor | _completar_ | _completar_ |
-| Admin | _completar_ | _completar_ |
-
-## Lo que queda fuera del alcance
-
-- Pasarela de pago real (el pago es simulado).
-- QR sin conexión y notificaciones push (acordado).
-- La compra y la selección de butacas requieren conexión, porque dependen de disponibilidad en tiempo real.
+| Cliente | cliente@gmail.com | 123456 |
+| Empleado | empleado@local.com | 123456 |
+| Gestor | gestor@local.com | 123456 |
+| Admin | admin@local.com | 123456 |
