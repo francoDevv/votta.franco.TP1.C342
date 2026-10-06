@@ -25,6 +25,7 @@ export class MisEntradas implements OnInit {
   compras = signal<MiCompra[]>([]);
   credito = signal(0);
   cargando = signal(true);
+  errorCarga = signal(false);
   cancelando = signal<number | null>(null);
   descargando = signal<number | null>(null);
   error = signal('');
@@ -50,13 +51,20 @@ export class MisEntradas implements OnInit {
   async cargar() {
     const clienteId = this.auth.usuario()!.id;
     this.cargando.set(true);
-    const [compras, credito] = await Promise.all([
-      this.entradasService.listarMiasAgrupadas(clienteId),
-      this.entradasService.creditoDisponible(clienteId),
-    ]);
-    this.compras.set(compras);
-    this.credito.set(credito);
-    this.cargando.set(false);
+    this.errorCarga.set(false);
+    try {
+      const [compras, credito] = await Promise.all([
+        this.entradasService.listarMiasAgrupadas(clienteId),
+        this.entradasService.creditoDisponible(clienteId),
+      ]);
+      this.compras.set(compras);
+      this.credito.set(credito);
+    } catch (err) {
+      console.error(err);
+      this.errorCarga.set(true);
+    } finally {
+      this.cargando.set(false);
+    }
   }
 
   private esProxima(c: MiCompra): boolean {

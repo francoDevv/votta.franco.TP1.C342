@@ -1,5 +1,10 @@
 @if (cargando()) {
   <p>Cargando…</p>
+} @else if (errorCarga()) {
+  <div class="card" style="max-width: 480px; margin: 40px auto; text-align: center;">
+    <p>No pudimos cargar esta página. Revisá tu conexión e intentá de nuevo.</p>
+    <button class="btn btn-primary" (click)="cargar()">Reintentar</button>
+  </div>
 } @else if (!funcion()) {
   <a routerLink="/cartelera" class="back-link">‹ Volver a la cartelera</a>
   <p>Función no encontrada.</p>

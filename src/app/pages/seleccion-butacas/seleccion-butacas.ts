@@ -30,6 +30,7 @@ export class SeleccionButacas implements OnInit, OnDestroy {
   misButacas = signal<Set<number>>(new Set());
   cargando = signal(true);
   error = signal('');
+  errorCarga = signal(false);
   private canal?: RealtimeChannel;
   private funcionId = 0;
 
@@ -54,22 +55,36 @@ export class SeleccionButacas implements OnInit, OnDestroy {
 
   async ngOnInit() {
     this.funcionId = Number(this.route.snapshot.paramMap.get('id'));
-    const funcion = await this.funcionesService.obtenerPorId(this.funcionId);
-    this.funcion.set(funcion);
+    await this.cargar();
+  }
 
-    if (funcion) {
-      const [butacas, precios] = await Promise.all([
-        this.salasService.listarButacas(funcion.sala_id),
-        this.butacasService.precios(this.funcionId),
-      ]);
-      this.butacas.set(butacas);
-      this.precios.set(precios);
-      await this.actualizarDisponibilidad();
-      const misIds = await this.butacasService.misReservas(this.funcionId);
-      this.misButacas.set(new Set(misIds));
-      this.canal = this.butacasService.suscribirse(this.funcionId, () => this.actualizarDisponibilidad());
+  async cargar() {
+    this.cargando.set(true);
+    this.errorCarga.set(false);
+    try {
+      const funcion = await this.funcionesService.obtenerPorId(this.funcionId);
+      this.funcion.set(funcion);
+
+      if (funcion) {
+        const [butacas, precios] = await Promise.all([
+          this.salasService.listarButacas(funcion.sala_id),
+          this.butacasService.precios(this.funcionId),
+        ]);
+        this.butacas.set(butacas);
+        this.precios.set(precios);
+        await this.actualizarDisponibilidad();
+        const misIds = await this.butacasService.misReservas(this.funcionId);
+        this.misButacas.set(new Set(misIds));
+        if (!this.canal) {
+          this.canal = this.butacasService.suscribirse(this.funcionId, () => this.actualizarDisponibilidad());
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      this.errorCarga.set(true);
+    } finally {
+      this.cargando.set(false);
     }
-    this.cargando.set(false);
   }
 
   ngOnDestroy() {

@@ -38,6 +38,8 @@ export class CandySeleccion implements OnInit {
   productos = signal<Producto[]>([]);
   combos = signal<Combo[]>([]);
   cargando = signal(true);
+  errorCarga = signal(false);
+  private funcionId = 0;
 
   cupon = signal<CuponAplicable | null>(null);
   porcentajeBienvenida = signal<number | null>(null);
@@ -197,29 +199,42 @@ export class CandySeleccion implements OnInit {
   }
 
   async ngOnInit() {
-    const funcionId = Number(this.route.snapshot.paramMap.get('id'));
-    const [funcion, misIds, productos, combos, precios] = await Promise.all([
-      this.funcionesService.obtenerPorId(funcionId),
-      this.butacasService.misReservas(funcionId),
-      this.candyService.listarProductos(true),
-      this.candyService.listarCombos(true),
-      this.butacasService.precios(funcionId),
-    ]);
+    this.funcionId = Number(this.route.snapshot.paramMap.get('id'));
+    await this.cargar();
+  }
 
-    this.funcion.set(funcion);
-    this.productos.set(productos);
-    this.combos.set(combos);
-    this.precios.set(precios);
+  async cargar() {
+    this.cargando.set(true);
+    this.errorCarga.set(false);
+    try {
+      const funcionId = this.funcionId;
+      const [funcion, misIds, productos, combos, precios] = await Promise.all([
+        this.funcionesService.obtenerPorId(funcionId),
+        this.butacasService.misReservas(funcionId),
+        this.candyService.listarProductos(true),
+        this.candyService.listarCombos(true),
+        this.butacasService.precios(funcionId),
+      ]);
 
-    if (funcion && misIds.length > 0) {
-      const todas = await this.salasService.listarButacas(funcion.sala_id);
-      this.entradasSeleccionadas.set(
-        todas
-          .filter((b) => misIds.includes(b.id))
-          .sort((a, b) => a.orden_fila - b.orden_fila || a.columna - b.columna || a.numero - b.numero)
-      );
+      this.funcion.set(funcion);
+      this.productos.set(productos);
+      this.combos.set(combos);
+      this.precios.set(precios);
+
+      if (funcion && misIds.length > 0) {
+        const todas = await this.salasService.listarButacas(funcion.sala_id);
+        this.entradasSeleccionadas.set(
+          todas
+            .filter((b) => misIds.includes(b.id))
+            .sort((a, b) => a.orden_fila - b.orden_fila || a.columna - b.columna || a.numero - b.numero)
+        );
+      }
+    } catch (err) {
+      console.error(err);
+      this.errorCarga.set(true);
+    } finally {
+      this.cargando.set(false);
     }
-    this.cargando.set(false);
   }
 
   urlImagen(path: string | null) {

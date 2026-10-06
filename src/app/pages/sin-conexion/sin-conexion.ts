@@ -23,9 +23,11 @@ export class SinConexion {
 
   constructor() {
     // Cuando vuelve la conexión, el usuario sigue donde estaba, sin tocar nada
-    effect(() => {
+    effect((onCleanup) => {
       if (this.pwa.online() && this.destino) {
-        untracked(() => this.router.navigateByUrl(this.destino!));
+        // Pequeña espera: el navegador avisa "online" antes de que la red responda
+        const t = setTimeout(() => untracked(() => this.router.navigateByUrl(this.destino!)), 1500);
+        onCleanup(() => clearTimeout(t));
       }
     });
   }
