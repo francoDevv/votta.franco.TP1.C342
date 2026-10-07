@@ -70,4 +70,5 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/sin-conexion/sin-conexion').then(m => m.SinConexion),
   },
   { path: '', redirectTo: 'cartelera', pathMatch: 'full' },
+  { path: '**', redirectTo: 'cartelera' }
 ];

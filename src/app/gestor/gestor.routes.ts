@@ -74,4 +74,5 @@ export const GESTOR_ROUTES: Routes = [
         canMatch: [rolGuard(['admin'])],
         loadComponent: () => import('./precios-admin/precios-admin').then(m => m.PreciosAdmin),
     },
+    { path: '**', redirectTo: '' }
 ];
